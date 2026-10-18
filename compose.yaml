@@ -56,6 +56,28 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+  worker:
+    build:
+      context: .
+      dockerfile: infra/api.Dockerfile
+    environment: *api-environment
+    command: ["celery", "-A", "deadlock.jobs.celery_app:celery_app", "worker", "--loglevel=INFO", "--concurrency=1"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  beat:
+    build:
+      context: .
+      dockerfile: infra/api.Dockerfile
+    environment: *api-environment
+    command: ["celery", "-A", "deadlock.jobs.celery_app:celery_app", "beat", "--loglevel=INFO", "--schedule=/tmp/celerybeat-schedule"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 volumes:
   postgres-data:
   redis-data:

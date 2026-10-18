@@ -1,6 +1,6 @@
 # Локальная разработка: сервер и база
 
-На этапе 2 реализованы FastAPI, семь таблиц PostgreSQL, Alembic и health endpoints. Поиск, загрузка матчей, Celery и Next.js будут добавлены следующими этапами.
+Основа сервера включает FastAPI, PostgreSQL, Alembic и health endpoints. Загрузка и обновления выполняются отдельными процессами Celery worker и beat; HTTP API поиска и страниц статистики и интерфейс Next.js относятся к следующим этапам.
 
 ## Версии
 
@@ -27,10 +27,16 @@ Compose ждёт PostgreSQL, применяет миграции отдельн�
 
 ```sh
 docker compose logs api migrate
+docker compose logs worker beat
+docker compose exec worker celery -A deadlock.jobs.celery_app:celery_app inspect ping
 docker compose down
 ```
 
 `down` сохраняет volumes; `down -v` удаляет данные и для обычной остановки не нужен. Это конфигурация разработки, не публичного размещения.
+
+Worker запускается с concurrency=1. В Compose предусмотрен один beat: он каждые 10 секунд подбирает сохранённые задания обновления и восстанавливает задания с истёкшим lease. Файл расписания beat находится в доступном пользователю контейнера `/tmp/celerybeat-schedule`. Не запускайте дополнительные экземпляры beat для этого проекта.
+
+Задания и их статусы хранятся в PostgreSQL; Redis обслуживает брокер, кеш и общий ограничитель запросов к источнику. При недоступности Redis внешние запросы не выполняются. Локальная политика источника — один запрос в секунду и одна история в шесть минут; пятиминутный cooldown refresh не гарантирует немедленной загрузки. Для локальных проверок адаптера можно задать `DEADLOCK_API_BASE_URL`; по умолчанию используется `https://api.deadlock-api.com/v1`.
 
 Если Homebrew установил Compose отдельно и `docker compose` ещё недоступен, используйте `docker-compose` с теми же аргументами; менять глобальные настройки Docker для этого не требуется.
 
@@ -83,4 +89,4 @@ uv run alembic check
 
 13 integration tests прошли на PostgreSQL 17.11 и Redis 8.10.2, запущенных отдельно на localhost в временном каталоге; автозапуск служб не включался. Проверены уникальность, foreign keys, nullable-значения, timezone-aware время, rollback, статусы и ограничение одного активного refresh. Health проверен с исправными и отказавшими зависимостями. Upgrade → downgrade → upgrade и Alembic check прошли.
 
-Обе Compose-конфигурации валидны, наличие четырёх закреплённых образов подтверждено registry. Docker Engine на машине отсутствует, поэтому сборка Dockerfile и полный контейнерный запуск пока не проверены. Этот пункт нужно выполнить после появления Engine; Python-сервер и база проверены напрямую.
+19 октября 2026 года проверен полный контейнерный запуск на Windows через Docker Desktop (Engine 28.3.2): `docker compose up --build -d --wait` успешно собрал образы, применил миграции и запустил API, PostgreSQL и Redis со статусом healthy. Оба health endpoint вернули `{"status":"ok"}` через опубликованный localhost-порт. Все 13 интеграционных тестов прошли внутри одноразового контейнера с отдельными PostgreSQL и Redis из `compose.test.yaml`. После проверки тестовые контейнеры удалены, основные сервисы оставлены работающими; volumes не удалялись.

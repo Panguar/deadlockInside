@@ -11,12 +11,13 @@ dependencies = [
   "psycopg[binary]>=3.2,<4",
   "alembic>=1.14,<2",
   "redis>=6,<8",
+  "httpx>=0.28,<1",
+  "celery[redis]>=5.4,<6",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=8,<10",
-    "httpx>=0.28,<1",
     "httpx2>=2.13.1",
 ]
 

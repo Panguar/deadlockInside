@@ -16,6 +16,8 @@ class Player(Base):
     rank_badge: Mapped[int | None] = mapped_column(Integer)
     profile_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     history_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    history_coverage: Mapped[str | None] = mapped_column(String(16))
+    history_stale: Mapped[bool] = mapped_column(default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
