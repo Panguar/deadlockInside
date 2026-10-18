@@ -1,0 +1,173 @@
+{
+  "checked_on": "2026-10-18",
+  "source": "https://api.deadlock-api.com/openapi.json",
+  "sha256": "bcf2f9625dc3e15a14cc7c6ea63d6f690cd270caf48fc0425d0c2cc0ef70dbbb",
+  "endpoints": {
+    "/v1/players/steam-search": {
+      "parameters": [
+        "search_query",
+        "limit",
+        "min_matches_played_last_30d",
+        "min_last_team_avg_badge",
+        "matches_played_weight"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "404",
+        "500"
+      ]
+    },
+    "/v1/players/steam": {
+      "parameters": [
+        "account_ids",
+        "refresh"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "404",
+        "429",
+        "500",
+        "502"
+      ]
+    },
+    "/v1/players/{account_id}/match-history": {
+      "parameters": [
+        "account_id",
+        "force_refetch"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "429",
+        "500"
+      ]
+    },
+    "/v1/players/{account_id}/rank": {
+      "parameters": [
+        "account_id"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "403",
+        "500"
+      ]
+    },
+    "/v1/matches/{match_id}/metadata": {
+      "parameters": [
+        "match_id",
+        "is_custom",
+        "disable_steam"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    "/v1/assets/heroes": {
+      "parameters": [
+        "language",
+        "client_version",
+        "only_active"
+      ],
+      "documented_statuses": [
+        "200",
+        "404",
+        "500"
+      ]
+    },
+    "/v1/analytics/hero-stats": {
+      "parameters": [
+        "bucket",
+        "game_mode",
+        "match_mode",
+        "min_unix_timestamp",
+        "max_unix_timestamp",
+        "min_duration_s",
+        "max_duration_s",
+        "min_networth",
+        "max_networth",
+        "min_average_badge",
+        "max_average_badge",
+        "min_match_id",
+        "max_match_id",
+        "min_hero_matches",
+        "max_hero_matches",
+        "min_hero_matches_total",
+        "max_hero_matches_total",
+        "include_item_ids",
+        "exclude_item_ids",
+        "ability_order_prefix",
+        "ability_unlock_order_prefix",
+        "account_id",
+        "account_ids"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "500"
+      ]
+    },
+    "/v1/analytics/hero-counter-stats": {
+      "parameters": [
+        "game_mode",
+        "match_mode",
+        "min_unix_timestamp",
+        "max_unix_timestamp",
+        "min_duration_s",
+        "max_duration_s",
+        "min_networth",
+        "max_networth",
+        "min_enemy_networth",
+        "max_enemy_networth",
+        "min_average_badge",
+        "max_average_badge",
+        "min_match_id",
+        "max_match_id",
+        "same_lane_filter",
+        "min_matches",
+        "max_matches",
+        "account_id",
+        "account_ids",
+        "hero_build_id"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "500"
+      ]
+    },
+    "/v1/analytics/hero-build-stats/{hero_id}": {
+      "parameters": [
+        "hero_id",
+        "match_mode",
+        "bucket",
+        "min_unix_timestamp",
+        "max_unix_timestamp",
+        "min_duration_s",
+        "max_duration_s",
+        "min_average_badge",
+        "max_average_badge",
+        "min_match_id",
+        "max_match_id",
+        "hero_build_id",
+        "include_performance",
+        "min_matches",
+        "account_id",
+        "account_ids",
+        "ability_order_prefix",
+        "ability_unlock_order_prefix"
+      ],
+      "documented_statuses": [
+        "200",
+        "400",
+        "500"
+      ]
+    }
+  }
+}

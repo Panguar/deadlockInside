@@ -1,0 +1,71 @@
+{
+  "checked_on": "2026-10-18",
+  "notes": "Response-derived, anonymized, reduced fixtures; not verbatim full responses. No production requests should use these IDs.",
+  "fixtures": {
+    "contract-snapshot.json": {
+      "sha256": "0b7496322ab71d0178a54064f87791cb7f55a3773c5afad2ca810d59a932ff1a",
+      "kind": "contract-summary",
+      "http_status": 200
+    },
+    "hero-builds.json": {
+      "sha256": "3a2ce399e496ef2e82f3cfe56bcc8aa9418dcc6777ce0a626f98a2fdae97bc76",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "hero-counters.json": {
+      "sha256": "d8f186443a6106d20540aaa8aecd93f808bdf94dfa692f7f60da502b300c12dd",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "hero-stats.json": {
+      "sha256": "3dcceb80258c3ef8d55311f5704cd722570e4b4db0209a06a41076a479189d54",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "heroes.json": {
+      "sha256": "cef4dcb027f5809409cd224c0a1bd7d702c753d2c10814e7f55e239852326e80",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "history-empty.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "history.json": {
+      "sha256": "9fd1ca44bce240670400114352416ee072df3c587c2d91830b0003f685d60317",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "match-metadata.json": {
+      "sha256": "ab35a75c450130001db351e176937b4cc045ae682c92eb056334dcf8436b92be",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "metadata-unavailable.json": {
+      "sha256": "cb74e74daccee5883aa59a1ce6c6cf4918dd8a79b5dc21621992a5abba7a77aa",
+      "kind": "response-derived",
+      "http_status": 503
+    },
+    "profile-empty.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "profile.json": {
+      "sha256": "5ba9b27125615a40a4065d645b2a7920a3b4c6043c32806655c2fb7ef4edc025",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "rank-unranked.json": {
+      "sha256": "7720d196e27e908bb8cad118c99e025006d5929d5e7c488e3abcc0a518665118",
+      "kind": "response-derived",
+      "http_status": 200
+    },
+    "search-ambiguous.json": {
+      "sha256": "e8b159ccf35f8b6905538e7cd5e093d972e6bbca24e6450cd85c5e7b5cec19a0",
+      "kind": "response-derived",
+      "http_status": 200
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "hero_id": 1,
+    "hero_build_id": 579362,
+    "bucket": 0,
+    "wins": 363,
+    "losses": 376,
+    "matches": 739,
+    "players": 678
+  },
+  {
+    "hero_id": 1,
+    "hero_build_id": 256053,
+    "bucket": 0,
+    "wins": 349,
+    "losses": 331,
+    "matches": 680,
+    "players": 630
+  },
+  {
+    "hero_id": 1,
+    "hero_build_id": 317821,
+    "bucket": 0,
+    "wins": 291,
+    "losses": 288,
+    "matches": 579,
+    "players": 538
+  }
+]

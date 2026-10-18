@@ -1,0 +1,16 @@
+[
+  {
+    "account_id": 10001,
+    "personaname": "Example Player",
+    "profileurl": "https://example.invalid/profiles/10001",
+    "avatar": "https://example.invalid/avatar.jpg",
+    "avatarmedium": "https://example.invalid/avatar.jpg",
+    "avatarfull": "https://example.invalid/avatar.jpg",
+    "realname": null,
+    "countrycode": null,
+    "last_updated": "2026-10-18T01:34:55Z",
+    "friends": [],
+    "matches_played_last_30d": 3,
+    "last_team_avg_badge": 0
+  }
+]

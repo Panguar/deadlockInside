@@ -1,0 +1,451 @@
+{
+  "match_info": {
+    "match_id": 90001,
+    "start_time": 1792332860,
+    "duration_s": 1845,
+    "winning_team": 1,
+    "match_outcome": 0,
+    "game_mode": 1,
+    "match_mode": 1,
+    "not_scored": false,
+    "average_badge_team0": 0,
+    "average_badge_team1": 0,
+    "players": [
+      {
+        "account_id": 10005,
+        "player_slot": 1,
+        "team": 0,
+        "hero_id": 86,
+        "kills": 8,
+        "deaths": 6,
+        "assists": 3,
+        "net_worth": 31018,
+        "level": 30,
+        "last_hits": 169,
+        "denies": 1,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 3612874202,
+            "game_time_s": 14,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 968099481,
+            "game_time_s": 60,
+            "sold_time_s": 1024,
+            "flags": 1
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 32660,
+            "boss_damage": 1643,
+            "player_damage_taken": 30507
+          }
+        ]
+      },
+      {
+        "account_id": 10006,
+        "player_slot": 3,
+        "team": 0,
+        "hero_id": 15,
+        "kills": 1,
+        "deaths": 20,
+        "assists": 5,
+        "net_worth": 22208,
+        "level": 26,
+        "last_hits": 93,
+        "denies": 0,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 2521902222,
+            "game_time_s": 12,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 2521902222,
+            "game_time_s": 61,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 13719,
+            "boss_damage": 3935,
+            "player_damage_taken": 49202
+          }
+        ]
+      },
+      {
+        "account_id": 10007,
+        "player_slot": 9,
+        "team": 1,
+        "hero_id": 1,
+        "kills": 16,
+        "deaths": 6,
+        "assists": 10,
+        "net_worth": 29566,
+        "level": 29,
+        "last_hits": 113,
+        "denies": 0,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 491391007,
+            "game_time_s": 31,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 1593133799,
+            "game_time_s": 118,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 26541,
+            "boss_damage": 3089,
+            "player_damage_taken": 20363
+          }
+        ]
+      },
+      {
+        "account_id": 10008,
+        "player_slot": 12,
+        "team": 1,
+        "hero_id": 19,
+        "kills": 18,
+        "deaths": 5,
+        "assists": 16,
+        "net_worth": 45937,
+        "level": 35,
+        "last_hits": 151,
+        "denies": 0,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 2460791803,
+            "game_time_s": 11,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 2460791803,
+            "game_time_s": 55,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 38967,
+            "boss_damage": 5061,
+            "player_damage_taken": 35012
+          }
+        ]
+      },
+      {
+        "account_id": 10009,
+        "player_slot": 10,
+        "team": 1,
+        "hero_id": 8,
+        "kills": 3,
+        "deaths": 3,
+        "assists": 18,
+        "net_worth": 30640,
+        "level": 30,
+        "last_hits": 135,
+        "denies": 2,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 1725685134,
+            "game_time_s": 18,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 3133377790,
+            "game_time_s": 102,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 21451,
+            "boss_damage": 1813,
+            "player_damage_taken": 15450
+          }
+        ]
+      },
+      {
+        "account_id": 10010,
+        "player_slot": 2,
+        "team": 0,
+        "hero_id": 12,
+        "kills": 2,
+        "deaths": 13,
+        "assists": 5,
+        "net_worth": 26417,
+        "level": 28,
+        "last_hits": 85,
+        "denies": 1,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 2351041382,
+            "game_time_s": 13,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 18921423,
+            "game_time_s": 103,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 11420,
+            "boss_damage": 2607,
+            "player_damage_taken": 32414
+          }
+        ]
+      },
+      {
+        "account_id": 10011,
+        "player_slot": 11,
+        "team": 1,
+        "hero_id": 2,
+        "kills": 4,
+        "deaths": 3,
+        "assists": 26,
+        "net_worth": 30862,
+        "level": 30,
+        "last_hits": 93,
+        "denies": 1,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 1065103387,
+            "game_time_s": 48,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 1065103387,
+            "game_time_s": 95,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 24859,
+            "boss_damage": 2231,
+            "player_damage_taken": 12140
+          }
+        ]
+      },
+      {
+        "account_id": 10001,
+        "player_slot": 5,
+        "team": 0,
+        "hero_id": 58,
+        "kills": 1,
+        "deaths": 12,
+        "assists": 4,
+        "net_worth": 27329,
+        "level": 28,
+        "last_hits": 131,
+        "denies": 0,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 1469918191,
+            "game_time_s": 11,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 1469918191,
+            "game_time_s": 64,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 10955,
+            "boss_damage": 3703,
+            "player_damage_taken": 18874
+          }
+        ]
+      },
+      {
+        "account_id": 10012,
+        "player_slot": 4,
+        "team": 0,
+        "hero_id": 78,
+        "kills": 4,
+        "deaths": 8,
+        "assists": 9,
+        "net_worth": 30037,
+        "level": 30,
+        "last_hits": 109,
+        "denies": 0,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 1904698842,
+            "game_time_s": 19,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 3077079169,
+            "game_time_s": 64,
+            "sold_time_s": 941,
+            "flags": 1
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 28976,
+            "boss_damage": 1741,
+            "player_damage_taken": 26279
+          }
+        ]
+      },
+      {
+        "account_id": 10013,
+        "player_slot": 8,
+        "team": 1,
+        "hero_id": 50,
+        "kills": 13,
+        "deaths": 0,
+        "assists": 19,
+        "net_worth": 50398,
+        "level": 36,
+        "last_hits": 166,
+        "denies": 4,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 1976701714,
+            "game_time_s": 21,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 1976701714,
+            "game_time_s": 48,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 49481,
+            "boss_damage": 18105,
+            "player_damage_taken": 16020
+          }
+        ]
+      },
+      {
+        "account_id": 10014,
+        "player_slot": 6,
+        "team": 0,
+        "hero_id": 80,
+        "kills": 3,
+        "deaths": 7,
+        "assists": 5,
+        "net_worth": 30054,
+        "level": 30,
+        "last_hits": 111,
+        "denies": 0,
+        "player_match_outcome": 2,
+        "items": [
+          {
+            "item_id": 1385849824,
+            "game_time_s": 1,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 2717130900,
+            "game_time_s": 123,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 17956,
+            "boss_damage": 0,
+            "player_damage_taken": 26517
+          }
+        ]
+      },
+      {
+        "account_id": 10015,
+        "player_slot": 7,
+        "team": 1,
+        "hero_id": 7,
+        "kills": 12,
+        "deaths": 2,
+        "assists": 5,
+        "net_worth": 54447,
+        "level": 36,
+        "last_hits": 214,
+        "denies": 3,
+        "player_match_outcome": 1,
+        "items": [
+          {
+            "item_id": 1999680326,
+            "game_time_s": 15,
+            "sold_time_s": 0,
+            "flags": 0
+          },
+          {
+            "item_id": 1999680326,
+            "game_time_s": 68,
+            "sold_time_s": 0,
+            "flags": 0
+          }
+        ],
+        "stats": [
+          {
+            "time_stamp_s": 1845,
+            "player_damage": 22494,
+            "boss_damage": 21695,
+            "player_damage_taken": 16701
+          }
+        ]
+      }
+    ]
+  },
+  "hero_build_ids": {},
+  "pregame_hero_ids": {},
+  "banned_hero_ids": []
+}
