@@ -10,7 +10,7 @@
 
 **Spec:** [Архитектура и границы релиза](../specs/2026-10-18-deadlock-inside-design.md).
 
-Статус: выполнение начато 18 октября 2026 года; исследование этапа 1 выполнено. После каждого этапа — остановка и отчёт по указанию пользователя. Next.js и Python подтверждены пользователем; остальные решения — предложения спецификации. Каждый этап заканчивается проверяемым результатом и отдельным коммитом.
+Статус: выполнение начато 18 октября 2026 года; этапы 1–2 выполнены; этап 3 не начат. После каждого этапа — остановка и отчёт по указанию пользователя. Next.js и Python подтверждены пользователем; остальные решения — предложения спецификации. Каждый этап заканчивается проверяемым результатом и отдельным коммитом.
 
 ## Global Constraints
 
@@ -73,13 +73,15 @@ scripts/                          # Smoke, backup, restore
 
 **Интерфейсы:** `create_app() -> FastAPI`, `get_session()`; `/health/live`, `/health/ready`; таблицы players, heroes, matches, match_players, rank_snapshots, hero_stats_snapshots, refresh_jobs.
 
-- [ ] Выбрать совместимые стабильные версии Python/Node и библиотек; закрепить версии и lock-файлы. Менеджеры — uv и pnpm.
-- [ ] Написать падающие PostgreSQL integration tests: уникальность account_id, match_id и `(match_id, account_id)`, nullable rank/damage, откат невалидного матча.
-- [ ] Реализовать модели и миграции с внешними ключами, timezone-aware датами и индексами истории по игроку/времени. Проверить upgrade → downgrade → upgrade на отдельной тестовой БД.
-- [ ] Написать и выполнить падающие health tests; реализовать live=200 и ready=200/503 в зависимости от PostgreSQL/Redis. В ответах нет DSN.
-- [ ] Подключить API, PostgreSQL, Redis в Compose, healthchecks и именованный volume БД; описать запуск тестовой БД отдельно от пользовательских данных.
-- [ ] Проверка из `apps/api`: `uv run pytest tests/integration/test_schema.py tests/integration/test_health.py -v`; из корня: `docker compose config`. Ожидается успех.
-- [ ] Коммит: `feat: add API and database foundation`.
+- [x] Выбрать совместимые стабильные версии Python/Node и библиотек; закрепить версии и lock-файлы. Python-зависимости закреплены uv.lock; Node — .node-version. pnpm/web lock появится на этапе 6.
+- [x] Написать падающие PostgreSQL integration tests: уникальность account_id, match_id и `(match_id, account_id)`, nullable rank/damage, откат невалидного матча.
+- [x] Реализовать модели и миграции с внешними ключами, timezone-aware датами и индексами истории по игроку/времени. Проверить upgrade → downgrade → upgrade на отдельной тестовой БД.
+- [x] Написать и выполнить падающие health tests; реализовать live=200 и ready=200/503 в зависимости от PostgreSQL/Redis. В ответах нет DSN.
+- [x] Подключить API, PostgreSQL, Redis в Compose, healthchecks и именованный volume БД; описать запуск тестовой БД отдельно от пользовательских данных.
+- [x] Проверка из `apps/api`: `uv run pytest tests/integration/test_schema.py tests/integration/test_health.py -v`; из корня: `docker compose config`. Ожидается успех.
+- [x] Коммит: `feat: add API and database foundation`.
+
+Результат: [локальный запуск и проверки](../../local-development.md). 13 integration tests прошли; Compose config проверен. Docker Engine отсутствует: сборка и запуск контейнеров пока не проверены.
 
 ## Этап 3. Надёжная загрузка и обновления
 
@@ -163,4 +165,4 @@ scripts/                          # Smoke, backup, restore
 
 ## Самопроверка
 
-Все экраны первого релиза привязаны к этапам; ограничения источника и основные отказы имеют проверки. Контракт API общий для web/server, ID и временные границы согласованы. Авторизация, live и прогнозы вынесены за пределы релиза. Этап 1 выполнен; следующий — основа сервера и хранилища. Код приложения ещё не написан.
+Все экраны первого релиза привязаны к этапам; ограничения источника и основные отказы имеют проверки. Контракт API общий для web/server, ID и временные границы согласованы. Авторизация, live и прогнозы вынесены за пределы релиза. Этапы 1–2 выполнены; следующий — адаптер источника и фоновые обновления. Реализована основа Python API и хранилища.

@@ -1,0 +1,28 @@
+# Standalone test project. Do not merge with compose.yaml.
+name: deadlock-inside-tests
+services:
+  postgres:
+    image: postgres:17.11
+    environment:
+      POSTGRES_USER: deadlock
+      POSTGRES_PASSWORD: test-only
+      POSTGRES_DB: deadlock_test
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "deadlock", "-d", "deadlock_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  redis:
+    image: redis:8.10.2
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:56379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
