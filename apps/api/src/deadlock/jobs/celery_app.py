@@ -18,5 +18,13 @@ celery_app.conf.update(
             "task": "deadlock.dispatch_queued_refreshes",
             "schedule": 10.0,
         },
+        "refresh-hero-analytics-hourly": {
+            "task": "deadlock.refresh_hero_analytics",
+            "schedule": 3600.0,
+        },
+        "refresh-hero-catalog-daily": {
+            "task": "deadlock.refresh_hero_catalog",
+            "schedule": 86400.0,
+        },
     },
 )

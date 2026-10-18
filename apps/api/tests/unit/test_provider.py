@@ -32,6 +32,49 @@ def test_history_normalizes_uint32_account_id_and_optional_fields():
     assert history[0].player_match_outcome == 2
 
 
+def test_fetch_hero_catalog_uses_active_russian_assets_fixture():
+    rows = json.loads((FIXTURES / "heroes.json").read_text())
+    provider = provider_for(lambda request: httpx.Response(200, json=rows))
+
+    heroes = provider.fetch_heroes()
+
+    assert len(heroes) == 3
+    assert heroes[0].hero_id == rows[0]["id"]
+    assert heroes[0].name == rows[0]["name"]
+
+
+def test_fetch_bucketed_analytics_passes_bounds_and_preserves_boundary_rows():
+    start, end = 1_790_812_800, 1_790_820_000
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json=[
+            {"hero_id": 1, "bucket": start, "wins": 1, "losses": 0, "matches": 1,
+             "total_kills": 10, "total_deaths": 0, "total_assists": 5},
+            {"hero_id": 1, "bucket": end, "wins": 99, "losses": 0, "matches": 99,
+             "total_kills": 990, "total_deaths": 1, "total_assists": 0},
+        ])
+
+    provider = provider_for(handler)
+    rows = provider.fetch_hero_stats(start_timestamp=start, end_timestamp=end, bucket="start_time_hour")
+
+    assert requests[0].url.path == "/analytics/hero-stats"
+    assert requests[0].url.params["bucket"] == "start_time_hour"
+    assert requests[0].url.params["min_unix_timestamp"] == str(start)
+    assert requests[0].url.params["max_unix_timestamp"] == str(end - 1)
+    assert [row.bucket for row in rows] == [start, end]
+
+
+def test_bucketed_analytics_rejects_missing_bucket_field():
+    provider = provider_for(lambda request: httpx.Response(200, json=[{"hero_id": 1, "wins": 1}]))
+
+    from deadlock.providers.deadlock_api import ProviderBadResponse
+    with pytest.raises(ProviderBadResponse, match="omitted requested hero analytics buckets"):
+        provider.fetch_hero_stats(start_timestamp=1_790_812_800, end_timestamp=1_790_820_000,
+                                  bucket="start_time_hour")
+
+
 def test_provider_returns_429_history_fallback_as_stale_data():
     rows = json.loads((FIXTURES / "history.json").read_text())
     provider = provider_for(lambda request: httpx.Response(429, json=rows, headers={"Retry-After": "30"}))

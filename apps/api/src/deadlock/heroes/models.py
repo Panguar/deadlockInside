@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Integer, String, UniqueConstraint, func
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Identity, Integer, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -31,4 +31,34 @@ class HeroStatsSnapshot(Base):
     data: Mapped[dict] = mapped_column(JSONB)
     source: Mapped[str] = mapped_column(String(100), server_default="deadlock-api")
     sample_size: Mapped[int] = mapped_column(BigInteger)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class HeroAnalyticsSnapshot(Base):
+    __tablename__ = "hero_analytics_snapshots"
+    __table_args__ = (
+        UniqueConstraint("filter_key", "fetched_at"),
+        CheckConstraint("sample_size >= 0", name="sample_size_nonnegative"),
+        CheckConstraint("period_end > period_start", name="period_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    filter_key: Mapped[str] = mapped_column(String(64), index=True)
+    filters: Mapped[dict] = mapped_column(JSONB)
+    data: Mapped[list] = mapped_column(JSONB)
+    source: Mapped[str] = mapped_column(String(100))
+    sample_size: Mapped[int] = mapped_column(BigInteger)
+    period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class HeroCatalogSnapshot(Base):
+    __tablename__ = "hero_catalog_snapshots"
+    __table_args__ = (CheckConstraint("sample_size >= 0", name="sample_size_nonnegative"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    source: Mapped[str] = mapped_column(String(100))
+    sample_size: Mapped[int] = mapped_column(BigInteger)
+    hero_ids: Mapped[list] = mapped_column(JSONB)
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

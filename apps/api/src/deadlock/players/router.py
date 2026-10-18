@@ -12,8 +12,9 @@ from deadlock.core.rate_limit import enforce_rate_limit
 from deadlock.jobs.service import request_refresh
 from deadlock.matches.models import Match, MatchPlayer
 from deadlock.players.models import Player
-from deadlock.players.schemas import ApiMeta, Envelope, PlayerCandidateOut, PlayerOut, RefreshAccepted
+from deadlock.players.schemas import ApiMeta, Envelope, PlayerCandidateOut, PlayerOut, PlayerStatsOut, RefreshAccepted
 from deadlock.players.schemas import ErrorEnvelope
+from deadlock.players.stats import PlayerMatchRow, calculate_player_stats
 from deadlock.matches.schemas import MatchHistoryItem
 from deadlock.players.service import get_player
 from deadlock.providers.deadlock_api import ProviderBadResponse, ProviderNotFound, ProviderUnavailable
@@ -126,6 +127,53 @@ def read_player(request: Request, account_id: str):
     }
     return {"data": data, "meta": ApiMeta(source="database", updated_at=updated_at, sample_size=sample_size,
                                             coverage=player.history_coverage or "unknown", stale=player.history_stale)}
+
+
+@router.get("/{account_id}/stats", response_model=Envelope[PlayerStatsOut], responses={
+    404: {"model": ErrorEnvelope}, 422: {"model": ErrorEnvelope},
+})
+def read_player_stats(
+    request: Request,
+    account_id: str,
+    hero_id: int | None = Query(default=None, gt=0, le=9_223_372_036_854_775_807),
+    from_: datetime | None = Query(default=None, alias="from"),
+    to: datetime | None = None,
+):
+    try:
+        normalized = _account_id(account_id)
+    except ValueError:
+        return error_response(request, 422, "validation_error", "Player identifier is invalid")
+    if (from_ is not None and from_.tzinfo is None) or (to is not None and to.tzinfo is None):
+        return error_response(request, 422, "validation_error", "Time filters must include a UTC offset")
+    try:
+        from_ = from_.astimezone(timezone.utc) if from_ else None
+        to = to.astimezone(timezone.utc) if to else None
+    except (OverflowError, ValueError):
+        return error_response(request, 422, "validation_error", "Time filters are outside the supported range")
+    if from_ and to and from_ >= to:
+        return error_response(request, 422, "validation_error", "The from filter must be earlier than to")
+
+    with request.app.state.session_factory() as session:
+        player = session.get(Player, normalized)
+        if player is None:
+            return error_response(request, 404, "player_not_found", "Player profile was not found")
+        filters = [MatchPlayer.account_id == normalized]
+        if hero_id is not None:
+            filters.append(MatchPlayer.hero_id == hero_id)
+        if from_ is not None:
+            filters.append(Match.started_at >= from_)
+        if to is not None:
+            filters.append(Match.started_at < to)
+        records = session.execute(select(
+            MatchPlayer.hero_id, MatchPlayer.player_match_outcome, MatchPlayer.kills,
+            MatchPlayer.deaths, MatchPlayer.assists,
+        ).join(Match, Match.match_id == MatchPlayer.match_id).where(*filters)).all()
+        stats = calculate_player_stats([PlayerMatchRow(*row) for row in records])
+        updated_at, stale = player.history_updated_at, player.history_stale
+    return {"data": stats, "meta": ApiMeta(
+        source="database", updated_at=updated_at, sample_size=stats.sample_size,
+        coverage="unknown", stale=stale,
+    )}
 
 
 @router.get("/{account_id}/matches", response_model=Envelope[list[MatchHistoryItem]], responses={

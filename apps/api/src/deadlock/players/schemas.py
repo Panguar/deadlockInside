@@ -55,3 +55,23 @@ class JobOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     error_code: str | None = None
+
+
+class PlayerHeroStatsOut(BaseModel):
+    hero_id: str
+    sample_size: int
+    decided_matches: int
+    wins: int
+    win_rate: float | None
+    kda: float | None
+    kda_sample_size: int
+
+
+class PlayerStatsOut(BaseModel):
+    sample_size: int
+    decided_matches: int
+    wins: int
+    win_rate: float | None
+    kda: float | None
+    kda_sample_size: int
+    heroes: list[PlayerHeroStatsOut]

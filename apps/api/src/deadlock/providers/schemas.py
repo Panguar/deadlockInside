@@ -37,6 +37,30 @@ class ProviderPlayer(PlayerCandidate):
     profile_updated_at: datetime | None = None
 
 
+class ProviderHero(ProviderSchema):
+    hero_id: int = Field(gt=0, strict=True, validation_alias=AliasChoices("id", "hero_id"))
+    name: str = Field(min_length=1, max_length=200)
+    class_name: str | None = Field(default=None, max_length=200)
+    client_version: int | None = None
+
+
+class ProviderHeroStats(ProviderSchema):
+    hero_id: int = Field(gt=0, strict=True)
+    bucket: int | None = Field(default=None, ge=0, strict=True)
+    wins: int | None = Field(default=None, ge=0, strict=True)
+    losses: int | None = Field(default=None, ge=0, strict=True)
+    matches: int | None = Field(default=None, ge=0, strict=True)
+    total_kills: int | None = Field(default=None, ge=0, strict=True)
+    total_deaths: int | None = Field(default=None, ge=0, strict=True)
+    total_assists: int | None = Field(default=None, ge=0, strict=True)
+
+    @classmethod
+    def from_provider(cls, row: dict[str, Any]) -> "ProviderHeroStats":
+        if not isinstance(row, dict):
+            raise ValueError("hero analytics row must be an object")
+        return cls.model_validate(row)
+
+
 class ProviderHistoryEntry(ProviderSchema):
     account_id: AccountId
     match_id: int = Field(gt=0, strict=True)

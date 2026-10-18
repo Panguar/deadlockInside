@@ -68,11 +68,13 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     from deadlock.jobs.router import router as jobs_router
+    from deadlock.heroes.router import router as heroes_router
     from deadlock.matches.router import router as matches_router
     from deadlock.players.router import router as players_router
 
     app.include_router(players_router, prefix="/api/v1")
     app.include_router(matches_router, prefix="/api/v1")
     app.include_router(jobs_router, prefix="/api/v1")
+    app.include_router(heroes_router, prefix="/api/v1")
 
     return app

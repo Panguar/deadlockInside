@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from contextlib import nullcontext
+import os
 import time
 from typing import Any, Callable
 
@@ -11,6 +12,8 @@ from deadlock.providers.limiter import RateLimitDeferred
 from deadlock.providers.schemas import (
     PlayerCandidate,
     ProviderHistoryEntry,
+    ProviderHero,
+    ProviderHeroStats,
     ProviderPlayer,
     provider_match_from_metadata,
 )
@@ -55,6 +58,7 @@ class DeadlockProvider:
         self.base_url = base_url.rstrip("/")
         self.limiter = limiter
         self.before_request = before_request
+        self.api_key = os.environ.get("DEADLOCK_API_KEY")
         self.client = client or httpx.Client(timeout=httpx.Timeout(20, connect=3), follow_redirects=False)
         self.last_history_stale = False
 
@@ -104,7 +108,8 @@ class DeadlockProvider:
             with self._keep_lock(token):
                 try:
                     deadline = time.monotonic() + 20
-                    with self.client.stream("GET", f"{self.base_url}{path}", params=params) as response:
+                    headers = {"X-API-KEY": self.api_key} if self.api_key else None
+                    with self.client.stream("GET", f"{self.base_url}{path}", params=params, headers=headers) as response:
                         raw = self._read_body(response, max_bytes=max_bytes, deadline=deadline)
                     if response.status_code == 404:
                         raise ProviderNotFound("provider resource not found")
@@ -197,3 +202,41 @@ class DeadlockProvider:
             return provider_match_from_metadata(payload)
         except (ValidationError, KeyError, TypeError, ValueError, OverflowError) as exc:
             raise ProviderBadResponse("provider returned invalid match metadata") from exc
+
+    def fetch_heroes(self) -> list[ProviderHero]:
+        payload = self._get("/assets/heroes", params={"only_active": "true", "language": "russian"})
+        if not isinstance(payload, list):
+            raise ProviderBadResponse("provider hero catalog must be an array")
+        try:
+            return [ProviderHero.model_validate(row) for row in payload]
+        except (ValidationError, TypeError, ValueError) as exc:
+            raise ProviderBadResponse("provider returned invalid hero catalog") from exc
+
+    def fetch_hero_stats(
+        self, *, start_timestamp: int, end_timestamp: int, bucket: str,
+        min_average_badge: int | None = None, max_average_badge: int | None = None,
+    ) -> list[ProviderHeroStats]:
+        if bucket not in ("start_time_hour", "start_time_day") or start_timestamp < 0 or end_timestamp <= start_timestamp:
+            raise ValueError("hero analytics period or bucket is invalid")
+        params = {
+            "bucket": bucket,
+            "min_unix_timestamp": start_timestamp,
+            "max_unix_timestamp": end_timestamp - 1,
+        }
+        for name, value in (("min_average_badge", min_average_badge), ("max_average_badge", max_average_badge)):
+            if value is not None:
+                if type(value) is not int or not 0 <= value <= 65_535:
+                    raise ValueError("average badge filters must be between 0 and 65535")
+                params[name] = value
+        if min_average_badge is not None and max_average_badge is not None and min_average_badge > max_average_badge:
+            raise ValueError("minimum average badge cannot exceed maximum")
+        payload = self._get("/analytics/hero-stats", params=params, bucket="analytics", max_bytes=64 * 1024 * 1024)
+        if not isinstance(payload, list):
+            raise ProviderBadResponse("provider hero analytics must be an array")
+        try:
+            rows = [ProviderHeroStats.from_provider(row) for row in payload]
+        except (ValidationError, TypeError, ValueError) as exc:
+            raise ProviderBadResponse("provider returned invalid hero analytics") from exc
+        if any(row.bucket is None for row in rows):
+            raise ProviderBadResponse("provider omitted requested hero analytics buckets")
+        return rows
