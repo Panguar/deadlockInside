@@ -49,10 +49,10 @@ docker compose up -d postgres redis
 cd apps/api
 uv sync --frozen
 uv run --env-file ../../.env alembic upgrade head
-uv run --env-file ../../.env uvicorn deadlock.main:create_app --factory --reload --host 127.0.0.1 --port 8000
+uv run --env-file ../../.env uvicorn deadlock.main:create_app --factory --no-proxy-headers --reload --host 127.0.0.1 --port 8000
 ```
 
-DATABASE_URL должен использовать `postgresql+psycopg://`, REDIS_URL — `redis://` или `rediss://`. Секреты читаются из окружения; app factory создаёт соединения в lifespan, закрывает пул и Redis при остановке. `get_session` выдаёт сессию на запрос; транзакции и commit принадлежат будущему сервисному слою.
+DATABASE_URL должен использовать `postgresql+psycopg://`, REDIS_URL — `redis://` или `rediss://`. Секреты читаются из окружения; app factory создаёт соединения в lifespan, закрывает пул и Redis при остановке. Параметр Uvicorn `--no-proxy-headers` сохраняет реальный адрес TCP-клиента для публичных лимитов. Для reverse proxy укажите доверенные CIDR в `TRUSTED_PROXY_NETWORKS` как JSON-массив, например `["10.0.0.0/8"]`; тогда API возьмёт адрес клиента из `X-Forwarded-For` только если TCP-соединение пришло от доверенного адреса. `get_session` выдаёт сессию на запрос; транзакции и commit принадлежат сервисному слою.
 
 `/health/live` проверяет процесс и работает при отказе БД/Redis. `/health/ready` выполняет SELECT 1 и PING; при ошибке возвращает 503 с общим сообщением и request_id без адресов или паролей. Это проверка доступности зависимостей, а не проверка миграций: их гарантирует отдельный шаг запуска.
 

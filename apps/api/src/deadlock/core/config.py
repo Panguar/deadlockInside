@@ -1,3 +1,5 @@
+from ipaddress import ip_network
+
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
@@ -9,6 +11,15 @@ class Settings(BaseSettings):
     database_url: SecretStr
     redis_url: SecretStr
     dependency_timeout_seconds: int = Field(default=2, ge=1, le=10)
+    trusted_proxy_networks: list[str] = Field(default_factory=list)
+
+    @field_validator("trusted_proxy_networks")
+    @classmethod
+    def valid_proxy_networks(cls, values: list[str]) -> list[str]:
+        try:
+            return [str(ip_network(value, strict=False)) for value in values]
+        except ValueError as exc:
+            raise ValueError("TRUSTED_PROXY_NETWORKS must contain valid IP networks") from exc
 
     @field_validator("database_url")
     @classmethod

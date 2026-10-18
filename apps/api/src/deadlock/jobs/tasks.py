@@ -8,7 +8,9 @@ from deadlock.core.config import Settings
 from deadlock.core.db import build_engine
 from deadlock.jobs.celery_app import celery_app
 from deadlock.jobs.dispatcher import dispatch_queued_jobs
-from deadlock.jobs.runner import RefreshRetryScheduled, run_refresh_job
+from deadlock.jobs.models import RefreshJob
+from deadlock.jobs.runner import RefreshRetryScheduled, run_match_metadata_job, run_refresh_job
+from sqlalchemy import select
 from deadlock.providers.deadlock_api import DeadlockProvider
 from deadlock.providers.limiter import RedisRateLimiter
 
@@ -27,10 +29,12 @@ def refresh_player_task(self, job_id: str):
                                limiter=RedisRateLimiter(redis))
     try:
         try:
-            return run_refresh_job(
-                session_factory, provider, Cache(redis), job_id,
-                retry_count=self.request.retries,
-            )
+            with session_factory() as session:
+                is_match_job = session.execute(select(RefreshJob.target_match_id).where(
+                    RefreshJob.job_id == job_id,
+                )).scalar_one_or_none() is not None
+            runner = run_match_metadata_job if is_match_job else run_refresh_job
+            return runner(session_factory, provider, Cache(redis), job_id, retry_count=self.request.retries)
         except RefreshRetryScheduled as exc:
             raise self.retry(exc=exc, countdown=exc.countdown)
     finally:

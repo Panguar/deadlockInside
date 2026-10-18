@@ -209,3 +209,74 @@ def run_refresh_job(session_factory, provider, cache, job_id, *, retry_count: in
     except Exception as exc:
         _finish_failure(session_factory, job_id, token, exc, retry_count=retry_count, attempt=attempt, now=clock())
         raise
+
+
+def run_match_metadata_job(session_factory, provider, cache, job_id, *, retry_count: int = 0,
+                           now: datetime | None = None) -> str:
+    now = now or datetime.now(timezone.utc)
+    token = uuid4()
+    with session_factory.begin() as session:
+        job = session.execute(select(RefreshJob).where(RefreshJob.job_id == job_id).with_for_update()).scalar_one_or_none()
+        if job is None or job.target_match_id is None:
+            return "missing"
+        if job.status in ("succeeded", "failed"):
+            return job.status
+        if job.status == "queued" and job.available_at > now:
+            return "queued"
+        if job.status == "running" and job.lease_expires_at and job.lease_expires_at <= now and job.attempts >= 4:
+            job.status = "failed"
+            job.finished_at = now
+            job.lease_expires_at = None
+            job.lease_token = None
+            job.error_code = "lease_expired"
+            return "failed"
+        if job.status == "queued" and job.attempts >= 4:
+            job.status = "failed"
+            job.finished_at = now
+            job.error_code = "retry_budget_exhausted"
+            return "failed"
+        claimed = session.execute(update(RefreshJob).where(
+            RefreshJob.job_id == job_id,
+            ((RefreshJob.status == "queued") & (RefreshJob.available_at <= now)) |
+            ((RefreshJob.status == "running") & (RefreshJob.lease_expires_at <= now)),
+            RefreshJob.attempts < 4,
+        ).values(status="running", attempts=RefreshJob.attempts + 1, started_at=now,
+                 finished_at=None, lease_expires_at=now + LEASE_DURATION,
+                 lease_token=token, dispatched_at=None).returning(
+                     RefreshJob.account_id, RefreshJob.target_match_id, RefreshJob.attempts)).one_or_none()
+        if claimed is None:
+            return "running"
+        account_id, match_id, attempt = claimed
+    try:
+        if hasattr(provider, "before_request"):
+            provider.before_request = lambda: _renew_lease(session_factory, job_id, token)
+        match = provider.fetch_match(match_id)
+        with session_factory.begin() as session:
+            owner = session.execute(select(RefreshJob.status, RefreshJob.lease_token).where(
+                RefreshJob.job_id == job_id,
+            ).with_for_update()).one_or_none()
+            if owner is None or owner.status != "running" or owner.lease_token != token:
+                return "superseded"
+            ingest_match(session, match)
+            participant_ids = set(session.execute(select(MatchPlayer.account_id).where(
+                MatchPlayer.match_id == match_id,
+            )).scalars())
+            session.execute(update(RefreshJob).where(RefreshJob.job_id == job_id, RefreshJob.lease_token == token).values(
+                status="succeeded", finished_at=now, lease_expires_at=None, lease_token=None, error_code=None,
+            ))
+        try:
+            cache.invalidate_refresh(account_id, [match_id], participant_ids)
+        except Exception:
+            pass
+        return "succeeded"
+    except LeaseLost:
+        return "superseded"
+    except (RateLimitDeferred, RateLimitUnavailable) as exc:
+        _defer_admission(session_factory, job_id, token, exc, attempt=attempt, now=now)
+        return "queued"
+    except (ProviderUnavailable, ProviderNotFound, ProviderBadResponse) as exc:
+        _finish_failure(session_factory, job_id, token, exc, retry_count=retry_count, attempt=attempt, now=now)
+        return "failed"
+    except Exception as exc:
+        _finish_failure(session_factory, job_id, token, exc, retry_count=retry_count, attempt=attempt, now=now)
+        raise

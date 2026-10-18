@@ -11,4 +11,4 @@ COPY apps/api/migrations ./migrations
 RUN uv sync --frozen --no-dev && useradd --uid 10001 --create-home app
 USER app
 EXPOSE 8000
-CMD ["uvicorn", "deadlock.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "deadlock.main:create_app", "--factory", "--no-proxy-headers", "--host", "0.0.0.0", "--port", "8000"]

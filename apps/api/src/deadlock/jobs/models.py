@@ -14,12 +14,15 @@ class RefreshJob(Base):
         CheckConstraint("status IN ('queued','running','succeeded','failed')", name="status_valid"),
         CheckConstraint("attempts >= 0", name="attempts_nonnegative"),
         Index("uq_refresh_jobs_active_account", "account_id", unique=True,
-              postgresql_where=text("status IN ('queued','running')")),
+              postgresql_where=text("status IN ('queued','running') AND target_match_id IS NULL")),
+        Index("uq_refresh_jobs_active_match", "target_match_id", unique=True,
+              postgresql_where=text("status IN ('queued','running') AND target_match_id IS NOT NULL")),
         Index("ix_refresh_jobs_status_available", "status", "available_at"),
     )
 
     job_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     account_id: Mapped[int] = mapped_column(ForeignKey("players.account_id"), index=True)
+    target_match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.match_id", ondelete="CASCADE"), index=True)
     status: Mapped[str] = mapped_column(String(16), server_default="queued")
     attempts: Mapped[int] = mapped_column(Integer, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
