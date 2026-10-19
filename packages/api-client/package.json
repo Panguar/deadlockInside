@@ -1,0 +1,13 @@
+{
+  "name": "@deadlock/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "node scripts/generate-openapi.mjs"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "deadlock-inside",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "generate:api": "pnpm --dir packages/api-client generate",
+    "typecheck": "pnpm --filter @deadlock/web typecheck",
+    "build": "pnpm --filter @deadlock/web build",
+    "test:e2e": "pnpm --filter @deadlock/web test:e2e"
+  }
+}
