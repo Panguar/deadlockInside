@@ -4,8 +4,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="brand" href="/" aria-label="Deadlock Inside — главная">
-        <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
-        <span>DEADLOCK <b>INSIDE</b></span>
+        <img src="/deadlock-insight.png" alt="Deadlock Insight" />
       </Link>
       <nav className="main-nav" aria-label="Основная навигация">
         <Link href="/heroes">Герои</Link>

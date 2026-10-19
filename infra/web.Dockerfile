@@ -19,6 +19,7 @@ RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app 
     && mkdir -p /app/apps/web/.next/cache && chown -R app:app /app
 COPY --from=build --chown=app:app /app/apps/web/.next/standalone ./
 COPY --from=build --chown=app:app /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=app:app /app/apps/web/public ./apps/web/public
 USER app
 EXPOSE 3000
 CMD ["node", "apps/web/server.js"]

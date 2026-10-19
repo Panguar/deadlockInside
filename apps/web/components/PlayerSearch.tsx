@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { apiRequest, type PlayerCandidate } from "@/lib/api";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { getSteamAvatarUrl } from "@/lib/steam-avatar";
 
 type SearchState = "idle" | "loading" | "ready" | "empty" | "error";
 
@@ -107,7 +109,7 @@ export function PlayerSearch() {
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => choose(candidate)}
               >
-                <span className="candidate-avatar">{candidate.personaname.slice(0, 1).toUpperCase()}</span>
+                <ImageWithFallback className="candidate-avatar" src={getSteamAvatarUrl(candidate.avatar_url)} alt={`${candidate.personaname}: аватар`} fallback={candidate.personaname.slice(0, 1).toUpperCase()} />
                 <span className="candidate-copy">
                   <strong>{candidate.personaname}</strong>
                   <small>ID {candidate.account_id}</small>

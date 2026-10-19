@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { apiRequest, delay, formatDate, formatDuration, formatNumber, type ApiMeta, type Job, type Match } from "@/lib/api";
+import { getHeroPortrait } from "@/lib/hero-portraits";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 type Purchase = { player: string; itemId: string; seconds: number | null; sourceOrder: number };
 
@@ -97,7 +99,7 @@ export function MatchDetail({ matchId }: { matchId: string }) {
                 <thead><tr><th>Игрок</th><th>K / D / A</th><th>Души</th><th>Урон</th></tr></thead>
                 <tbody>{players.map((player) => (
                   <tr key={player.account_id}>
-                    <td><Link href={`/players/${encodeURIComponent(player.account_id)}`} className="match-player-name"><span className="hero-sigil">{player.hero_name.slice(0, 1)}</span><span>{player.hero_name}<small>{player.personaname ?? `ID ${player.account_id}`}</small></span></Link></td>
+                    <td><Link href={`/players/${encodeURIComponent(player.account_id)}`} className="match-player-name"><ImageWithFallback className="hero-sigil hero-portrait" src={getHeroPortrait(player.hero_id)} alt={player.hero_name} fallback={player.hero_name.slice(0, 1)} /><span>{player.hero_name}<small>{player.personaname ?? `ID ${player.account_id}`}</small></span></Link></td>
                     <td>{player.kills ?? "—"} / {player.deaths ?? "—"} / {player.assists ?? "—"}</td>
                     <td>{formatNumber(player.net_worth, 0)}</td>
                     <td>{formatNumber(player.player_damage, 0)}</td>

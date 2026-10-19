@@ -22,6 +22,7 @@ const envelope = <T>(data: T) => ({
 });
 
 test("hero analytics and detail show verified English names beneath Russian names", async ({ page }) => {
+  await page.route("https://assets-bucket.deadlock-api.com/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWioAAAAASUVORK5CYII=", "base64") }));
   await page.route("**/api/v1/**", async (route) => {
     const { pathname } = new URL(route.request().url());
     if (pathname === "/api/v1/heroes/stats") {
@@ -51,12 +52,14 @@ test("hero analytics and detail show verified English names beneath Russian name
   await expect(board).toContainText("Rat King");
   await expect(board).toContainText("Venator");
   await expect(board).toContainText("Haze");
+  await expect(board.locator(".hero-portrait").first()).toHaveAttribute("src", /assets-bucket\.deadlock-api\.com/);
   await expect(board.locator("tbody tr").filter({ hasText: "Неизвестный герой" }).locator("small")).toHaveText("Герой");
   await expect(board.locator("tbody tr").filter({ hasText: "Новый герой" }).locator("small")).toHaveText("Герой");
   await expect(board).not.toContainText(/hero_/);
 
   await page.getByRole("link", { name: /Король крыс/ }).click();
   await expect(page.getByRole("heading", { name: "Король крыс" })).toBeVisible();
+  await expect(page.locator(".hero-detail-portrait")).toHaveAttribute("src", /assets-bucket\.deadlock-api\.com/);
   await expect(page.locator(".hero-detail-heading .eyebrow")).toHaveText("Rat King");
   await expect(page.locator(".hero-detail-page")).not.toContainText(/hero_/);
 });

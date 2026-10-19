@@ -43,6 +43,7 @@ button { color: inherit; }
   border-bottom: 1px solid var(--line); position: relative; z-index: 4;
 }
 .brand { display: inline-flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 800; letter-spacing: .13em; }
+.brand img { display: block; width: min(240px, 40vw); max-height: 49px; object-fit: contain; }
 .brand b { color: var(--olive-bright); }
 .brand-mark { width: 27px; height: 27px; border: 1px solid #687152; display: flex; gap: 3px; align-items: center; justify-content: center; transform: rotate(45deg); border-radius: 6px; }
 .brand-mark i { height: 11px; width: 2px; background: var(--olive-bright); display: block; }
@@ -79,6 +80,8 @@ main { flex: 1; }
 .candidate:hover, .candidate.active { background: #2a3026; }
 .candidate-avatar, .player-avatar { display: grid; place-items: center; flex: none; color: var(--olive-bright); background: linear-gradient(145deg, #48503a, #272e24); border: 1px solid #697353; font-weight: 700; }
 .candidate-avatar { width: 36px; height: 36px; border-radius: 9px; font-size: 14px; }
+.candidate-avatar:not(.image-fallback), .player-avatar:not(.image-fallback), .hero-sigil:not(.image-fallback), .hero-monogram:not(.image-fallback) { object-fit: cover; }
+.image-fallback { overflow: hidden; }
 .candidate-copy { display: grid; min-width: 0; }
 .candidate-copy strong { color: var(--ink); font-size: 13px; font-weight: 650; }
 .candidate-copy small { color: var(--muted); font-size: 10px; }
@@ -152,6 +155,7 @@ main { flex: 1; }
 .rank-block { min-width: 128px; padding-left: 25px; border-left: 1px solid var(--line); display: grid; gap: 2px; }
 .rank-block strong { color: var(--olive-bright); font-size: 29px; line-height: 1.2; }
 .rank-block > span:last-child { color: var(--muted); font-size: 10px; }
+.profile-refresh { margin-top: 8px; min-height: 34px; padding: 0 10px; font-size: 10px; }
 .notice { margin: 16px 0; padding: 12px 15px; border-radius: 8px; font-size: 11px; }
 .notice-muted { color: #c2bd9c; border: 1px solid #5d563a; background: #3a33231f; }
 .stats-section { margin-top: 31px; }
@@ -245,6 +249,7 @@ main { flex: 1; }
   body { font-size: 14px; }
   .site-header { width: calc(100% - 32px); height: 63px; }
   .brand { gap: 9px; font-size: 10px; }
+  .brand img { width: min(176px, 47vw); max-height: 42px; }
   .brand-mark { width: 24px; height: 24px; }
   .main-nav { gap: 15px; font-size: 11px; }
   .main-nav a:last-child { display: none; }
@@ -278,6 +283,7 @@ main { flex: 1; }
   .rank-block { min-width: 84px; padding-left: 12px; }
   .rank-block strong { font-size: 24px; }
   .rank-block > span:last-child { max-width: 82px; line-height: 1.3; }
+  .profile-refresh { padding: 0 7px; font-size: 9px; }
   .stat-grid { gap: 8px; }
   .stat-card { min-height: 118px; padding: 12px 11px; }
   .stat-card > span { font-size: 10px; }

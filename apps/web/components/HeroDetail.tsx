@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError, apiRequest, datePeriodError, delay, formatMatches, formatNumber, formatPercent, nextUtcDayStart, queryString, sourceDescription, type ApiMeta, type HeroDetail as HeroDetailData, type HeroStats } from "@/lib/api";
 import { getEnglishHeroName } from "@/lib/hero-names.en";
+import { getHeroPortrait } from "@/lib/hero-portraits";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 type HeroFilters = { from: string; to: string; minBadge: string; maxBadge: string };
 type AnalyticsState = "loading" | "pending" | "ready" | "error";
@@ -106,7 +108,7 @@ export function HeroDetail({ heroId, filters }: { heroId: string; filters: HeroF
     <div className="page-content hero-detail-page">
       <Link className="back-link" href={`/heroes${backQuery}`}>← Все герои</Link>
       <section className="hero-detail-heading">
-        <div className="hero-monogram" aria-hidden="true">{hero.name.slice(0, 1)}</div>
+        <ImageWithFallback className="hero-monogram hero-detail-portrait" src={getHeroPortrait(hero.hero_id, "card")} alt={hero.name} fallback={hero.name.slice(0, 1)} />
         <div><span className="eyebrow">{getEnglishHeroName(hero.hero_id) ?? "ГЕРОЙ DEADLOCK"}</span><h1>{hero.name}</h1><p>Hero ID {hero.hero_id}</p></div>
       </section>
       {meta && <p className="data-caption">{sourceDescription(meta)}{meta.stale ? " · данные устарели" : ""}</p>}

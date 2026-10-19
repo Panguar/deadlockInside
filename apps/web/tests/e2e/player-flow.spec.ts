@@ -22,7 +22,7 @@ const profile = (rankBadge: number | null = 18) =>
   envelope({
     account_id: accountId,
     personaname: "Alex",
-    avatar_url: null,
+    avatar_url: "https://avatars.steamstatic.com/alex.jpg",
     rank_badge: rankBadge,
     profile_updated_at: instant,
   });
@@ -213,8 +213,11 @@ async function mockProfileFlow(
 
 test("keyboard search disambiguates same-name players and opens a match", async ({ page }) => {
   await mockProfileFlow(page, { matchData: match, coldMatch: true });
+  await page.route("https://avatars.steamstatic.com/alex.jpg", (route) => route.fulfill({ status: 404 }));
+  await page.route("https://assets-bucket.deadlock-api.com/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWioAAAAASUVORK5CYII=", "base64") }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
+  await expect(page.locator(".brand img")).toHaveAttribute("src", "/deadlock-insight.png");
   await page.getByRole("heading", { name: /Каждый матч/ }).waitFor();
   const screenshotDir = resolve(process.cwd(), "../../.superpowers/screenshots");
   await mkdir(screenshotDir, { recursive: true });
@@ -228,6 +231,11 @@ test("keyboard search disambiguates same-name players and opens a match", async 
   await expect(page).toHaveURL(new RegExp(`/players/${accountId}`));
   await expect(page.getByRole("heading", { name: "Alex" })).toBeVisible();
   await expect(page.getByText("Ранг 18")).toBeVisible();
+  await expect(page.getByText("Источник может содержать не все матчи")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Обновить профиль" })).toBeVisible();
+  await expect(page.locator(".player-avatar img")).toHaveCount(0);
+  await expect(page.locator(".player-avatar")).toContainText("A");
+  await expect(page.locator(".match-hero .hero-sigil")).toHaveAttribute("src", /assets-bucket\.deadlock-api\.com/);
   await page.screenshot({ path: resolve(screenshotDir, "desktop-profile.png"), fullPage: true });
 
   await page.getByLabel("Герой").selectOption("7");
@@ -238,6 +246,7 @@ test("keyboard search disambiguates same-name players and opens a match", async 
   await expect(page.getByRole("heading", { name: /Матч 9223372036854775000/ })).toBeVisible();
   await expect(page.getByText("18446744073709551000")).toBeVisible();
   await expect(page.getByText("Dynamo")).toBeVisible();
+  await expect(page.locator(".player-table .hero-portrait").first()).toHaveAttribute("src", /assets-bucket\.deadlock-api\.com/);
 });
 
 test("empty history and unknown rank stay explicitly empty and nullable", async ({ page }) => {

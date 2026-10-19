@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, apiRequest, datePeriodError, delay, formatDate, formatDuration, formatMatches, formatNumber, formatPercent, isValidDateOnly, nextUtcDayStart, queryString, sourceDescription, type ApiMeta, type Hero, type Job, type MatchHistoryItem, type Player, type PlayerStats } from "@/lib/api";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { getHeroPortrait } from "@/lib/hero-portraits";
+import { getSteamAvatarUrl } from "@/lib/steam-avatar";
 
 type Filters = { heroId: string; from: string; to: string };
 type RefreshState = "idle" | "queued" | "running" | "failed" | "timeout";
@@ -222,7 +225,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
     <div className="page-content profile-page">
       <section className="profile-heading">
         <div className="player-identity">
-          <div className="player-avatar" aria-hidden="true">{player.personaname?.slice(0, 1).toUpperCase() ?? "?"}</div>
+          <ImageWithFallback className="player-avatar" src={getSteamAvatarUrl(player.avatar_url)} alt={`${player.personaname ?? `Игрок ${player.account_id}`}: аватар`} fallback={player.personaname?.slice(0, 1).toUpperCase() ?? "?"} />
           <div>
             <span className="eyebrow">ПРОФИЛЬ ИГРОКА</span>
             <h1>{player.personaname ?? `Игрок ${player.account_id}`}</h1>
@@ -233,13 +236,17 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
           <span className="eyebrow">РАНГ</span>
           <strong>{player.rank_badge == null ? "—" : formatNumber(player.rank_badge, 0)}</strong>
           <span>{player.rank_badge == null ? "Ранг не определён" : `Ранг ${player.rank_badge}`}</span>
+          <button className="button button-secondary profile-refresh" onClick={refreshProfile} disabled={refreshState === "queued" || refreshState === "running"}>
+            {refreshState === "queued" || refreshState === "running" ? "Обновляем…" : "Обновить профиль"}
+          </button>
         </div>
       </section>
-      {(playerMeta?.stale || playerMeta?.coverage === "partial") && (
+      {(playerMeta?.stale || playerMeta?.coverage === "partial" || playerMeta?.coverage === "unknown") && (
         <div className="notice notice-muted" role="status">
-          {playerMeta.stale ? "Показаны сохранённые данные; история может быть устаревшей." : "Показана доступная часть истории."}
+          {playerMeta.coverage === "unknown" ? "Источник может содержать не все матчи. Время обновления — время загрузки доступных данных." : playerMeta.stale ? "Показаны сохранённые данные; история может быть устаревшей." : "Показана доступная часть истории."}
         </div>
       )}
+      {refreshMessage && <p className={refreshState === "failed" ? "error-copy" : "pending-copy"} role={refreshState === "failed" ? "alert" : "status"}>{refreshMessage}</p>}
 
       <section className="stats-section">
         <div className="section-heading"><div><span className="eyebrow">ЗАГРУЖЕННАЯ ВЫБОРКА</span><h2>Результаты</h2></div></div>
@@ -279,7 +286,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
               return (
                 <Link className="match-row" key={row.match_id} href={`/matches/${encodeURIComponent(row.match_id)}`}>
                   <span className="match-result"><i className={row.player_match_outcome === 1 ? "win-dot" : row.player_match_outcome === 2 ? "loss-dot" : "unknown-dot"} />{row.player_match_outcome == null ? "—" : row.player_match_outcome === 1 ? "Победа" : "Поражение"}</span>
-                  <span className="match-hero"><span className="hero-sigil">{hero?.name.slice(0, 1) ?? "?"}</span><span>{hero?.name ?? `Герой ${row.hero_id}`}<small>{formatDate(row.started_at)}</small></span></span>
+                  <span className="match-hero"><ImageWithFallback className="hero-sigil" src={getHeroPortrait(row.hero_id)} alt={hero?.name ?? `Герой ${row.hero_id}`} fallback={hero?.name.slice(0, 1) ?? "?"} /><span>{hero?.name ?? `Герой ${row.hero_id}`}<small>{formatDate(row.started_at)}</small></span></span>
                   <span className="match-kda"><strong>{row.kills ?? "—"} / {row.deaths ?? "—"} / {row.assists ?? "—"}</strong><small>K / D / A</small></span>
                   <span className="match-duration">{formatDuration(row.duration_s)}</span>
                   <span className="match-link-label">Матч {row.match_id} <b aria-hidden="true">↗</b></span>
