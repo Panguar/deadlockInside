@@ -4,6 +4,16 @@
 **/__pycache__
 **/.pytest_cache
 **/node_modules
+**/.next
+**/.next-e2e
+**/test-results
+**/playwright-report
+**/backups
+**/.backups
+**/.env
+**/.env.*
+!.env.example
+!.env.test.example
 .env
 .env.*
 !*.example

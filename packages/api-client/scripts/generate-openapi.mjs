@@ -6,27 +6,31 @@ import openapiTS, { astToString } from "openapi-typescript";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(packageRoot, "../..");
+const apiRoot = resolve(repositoryRoot, "apps/api");
 const exported = spawnSync(
-  "docker",
+  "uv",
   [
-    "compose",
-    "exec",
-    "-T",
-    "api",
+    "run",
+    "--frozen",
+    "--no-sync",
     "python",
     "-c",
     "import json; from deadlock.main import create_app; print(json.dumps(create_app().openapi(), separators=(',', ':'))) ",
   ],
   {
-    cwd: repositoryRoot,
+    cwd: apiRoot,
     encoding: "utf8",
-    env: { ...process.env, POSTGRES_PASSWORD: "openapi-schema-generation" },
+    env: {
+      ...process.env,
+      DATABASE_URL: "postgresql+psycopg://schema:schema@127.0.0.1/schema",
+      REDIS_URL: "redis://127.0.0.1:6379/0",
+    },
   },
 );
 
 if (exported.error) throw exported.error;
 if (exported.status !== 0) {
-  throw new Error(`Could not export FastAPI OpenAPI schema: ${exported.stderr.trim()}`);
+  throw new Error(`Could not export FastAPI OpenAPI schema with uv: ${exported.stderr.trim()}`);
 }
 
 const schema = JSON.parse(exported.stdout);

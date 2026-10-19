@@ -1,0 +1,100 @@
+name: deadlock-inside-release
+services:
+  postgres:
+    image: postgres:17.11
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-deadlock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.production}
+      POSTGRES_DB: ${POSTGRES_DB:-deadlock}
+      PGUSER: ${POSTGRES_USER:-deadlock}
+      PGDATABASE: ${POSTGRES_DB:-deadlock}
+    volumes:
+      - release-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  redis:
+    image: redis:8.10.2
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - release-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  migrate:
+    image: deadlock-inside-api:local
+    environment: &api-environment
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-deadlock}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.production}@postgres:5432/${POSTGRES_DB:-deadlock}
+      REDIS_URL: redis://redis:6379/0
+      DEPENDENCY_TIMEOUT_SECONDS: ${DEPENDENCY_TIMEOUT_SECONDS:-2}
+      TRUSTED_PROXY_NETWORKS: ${TRUSTED_PROXY_NETWORKS:-[]}
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    image: deadlock-inside-api:local
+    build:
+      context: .
+      dockerfile: infra/api.Dockerfile
+    environment: *api-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=8)"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  worker:
+    image: deadlock-inside-api:local
+    environment: *api-environment
+    command: ["celery", "-A", "deadlock.jobs.celery_app:celery_app", "worker", "--loglevel=INFO", "--concurrency=1"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  beat:
+    image: deadlock-inside-api:local
+    environment: *api-environment
+    command: ["celery", "-A", "deadlock.jobs.celery_app:celery_app", "beat", "--loglevel=INFO", "--schedule=/var/lib/celery/celerybeat-schedule"]
+    volumes:
+      - release-beat-state:/var/lib/celery
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  web:
+    image: deadlock-inside-web:local
+    build:
+      context: .
+      dockerfile: infra/web.Dockerfile
+    environment:
+      DEADLOCK_API_INTERNAL_URL: http://api:8000
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:3000"
+    volumes:
+      - release-web-cache:/app/apps/web/.next/cache
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  release-postgres-data:
+  release-redis-data:
+  release-beat-state:
+  release-web-cache:

@@ -118,13 +118,14 @@ def test_history_defaults_to_twenty_and_caps_at_one_hundred(live_dependencies, m
 
 
 def test_match_detail_returns_partial_metadata_and_null_fields(live_dependencies, migrated_engine):
+    finished_at = datetime.now(timezone.utc)
     with migrated_engine.begin() as session:
         session.execute(text("DELETE FROM matches WHERE match_id=92110"))
         session.execute(text("INSERT INTO players (account_id) VALUES (29110) ON CONFLICT DO NOTHING"))
         session.execute(text("INSERT INTO heroes (hero_id, name) VALUES (59, 'Hero 59') ON CONFLICT DO NOTHING"))
         session.execute(text("INSERT INTO matches (match_id, started_at, status) VALUES (92110, :started, 'partial')"), {"started": BASE})
         session.execute(text("INSERT INTO match_players (match_id, account_id, hero_id, kills, items) VALUES (92110, 29110, 59, 2, CAST(:items AS jsonb))"), {"items": json.dumps([{"item_id": 1234567890123, "game_time_s": 10, "sold_time_s": None, "flags": 0}])})
-        session.execute(text("INSERT INTO refresh_jobs (job_id, account_id, target_match_id, status, attempts, created_at, available_at, finished_at) VALUES (gen_random_uuid(), 29110, 92110, 'succeeded', 1, :started, :started, :started)"), {"started": BASE})
+        session.execute(text("INSERT INTO refresh_jobs (job_id, account_id, target_match_id, status, attempts, created_at, available_at, finished_at) VALUES (gen_random_uuid(), 29110, 92110, 'succeeded', 1, :started, :started, :finished)"), {"started": BASE, "finished": finished_at})
     app = create_app()
     with TestClient(app) as client:
         response = client.get("/api/v1/matches/92110")

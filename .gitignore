@@ -2,6 +2,7 @@
 .env.*
 !.env.example
 !.env.test.example
+!.env.production.example
 .venv/
 __pycache__/
 *.py[cod]
@@ -11,8 +12,10 @@ __pycache__/
 node_modules/
 .next/
 apps/web/.next-e2e/
+apps/web/next-env.d.ts
 .superpowers/
 apps/web/test-results/
 apps/web/playwright-report/
 apps/web/tsconfig.tsbuildinfo
+.backups/
 .DS_Store
