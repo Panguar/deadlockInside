@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { apiRequest, ApiError, datePeriodError, formatMatches, formatNumber, formatPercent, nextUtcDayStart, queryString, sourceDescription, type ApiMeta, type HeroStats } from "@/lib/api";
+import { getEnglishHeroName } from "@/lib/hero-names.en";
 
 type BoardState = "loading" | "pending" | "ready" | "error";
 type HeroFilters = { from: string; to: string; minBadge: string; maxBadge: string };
@@ -151,7 +152,7 @@ export function HeroBoard({ compact = false, initialFilters }: { compact?: boole
             <tbody>
               {visibleRows.map((hero) => (
                 <tr key={hero.hero_id}>
-                  <td><Link className="hero-name" href={`/heroes/${encodeURIComponent(hero.hero_id)}${queryString({ from: filters.from || undefined, to: filters.to || undefined, min_average_badge: filters.minBadge || undefined, max_average_badge: filters.maxBadge || undefined })}`}><span className="hero-sigil">{hero.name?.slice(0, 1) ?? "?"}</span><span>{hero.name ?? `Герой ${hero.hero_id}`}<small>{hero.class_name ?? "Герой"}</small></span></Link></td>
+                  <td><Link className="hero-name" href={`/heroes/${encodeURIComponent(hero.hero_id)}${queryString({ from: filters.from || undefined, to: filters.to || undefined, min_average_badge: filters.minBadge || undefined, max_average_badge: filters.maxBadge || undefined })}`}><span className="hero-sigil">{hero.name?.slice(0, 1) ?? "?"}</span><span>{hero.name ?? `Герой ${hero.hero_id}`}<small>{getEnglishHeroName(hero.hero_id) ?? "Герой"}</small></span></Link></td>
                   <td>{formatNumber(hero.matches, 0)}</td>
                   <td>{formatNumber(hero.wins, 0)}</td>
                   <td className="metric-cell">{formatPercent(hero.win_rate)}</td>
