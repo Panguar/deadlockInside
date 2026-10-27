@@ -6,6 +6,8 @@ import { ApiError, apiRequest, datePeriodError, delay, formatDate, formatDuratio
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { getHeroPortrait } from "@/lib/hero-portraits";
 import { getSteamAvatarUrl } from "@/lib/steam-avatar";
+import { useAccount } from "@/components/AccountProvider";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 type Filters = { heroId: string; from: string; to: string };
 type RefreshState = "idle" | "queued" | "running" | "failed" | "timeout";
@@ -27,6 +29,7 @@ function utcDate(value: string) {
 }
 
 export function PlayerProfile({ accountId }: { accountId: string }) {
+  const { account, ready: accountReady } = useAccount();
   const [initialFilters] = useState(getInitialFilters);
   const [player, setPlayer] = useState<Player | null>(null);
   const [playerMeta, setPlayerMeta] = useState<ApiMeta | null>(null);
@@ -48,6 +51,23 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
   const refreshController = useRef<AbortController | null>(null);
   const paginationController = useRef<AbortController | null>(null);
   const historyGeneration = useRef(0);
+  const userInteracted = useRef(false);
+  const [periodReady, setPeriodReady] = useState(false);
+
+  useEffect(() => {
+    if (!accountReady) return;
+    if (account && !initialFilters.filters.from && !initialFilters.filters.to && !userInteracted.current && account.default_period !== "all") {
+      const days = Number(account.default_period);
+      if (Number.isFinite(days)) {
+        const end = new Date();
+        const start = new Date(end.getTime() - (days - 1) * 86400000);
+        const iso = (date: Date) => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).toISOString().slice(0, 10);
+        const from = iso(start); const to = iso(end);
+        setFilters((current) => ({ ...current, from, to })); setDraftFrom(from); setDraftTo(to);
+      }
+    }
+    setPeriodReady(true);
+  }, [accountReady, account?.default_period, initialFilters.filters.from, initialFilters.filters.to]);
 
   const apiFilters = useMemo(() => ({
     hero_id: filters.heroId || undefined,
@@ -57,6 +77,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
   const serializedFilters = queryString(apiFilters);
 
   useEffect(() => {
+    if (!periodReady) return;
     const controller = new AbortController();
     historyGeneration.current += 1;
     paginationController.current?.abort();
@@ -101,7 +122,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
       alive = false;
       controller.abort();
     };
-  }, [accountId, serializedFilters, retryKey]);
+  }, [accountId, serializedFilters, retryKey, periodReady]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -192,6 +213,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
 
   function applyDates(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    userInteracted.current = true;
     const error = datePeriodError(draftFrom, draftTo, true);
     if (error) return setFilterError(error);
     setFilterError("");
@@ -199,6 +221,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
   }
 
   function changeHero(heroId: string) {
+    userInteracted.current = true;
     setFilterError("");
     setFilters((current) => ({ ...current, heroId }));
   }
@@ -241,6 +264,7 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
           </button>
         </div>
       </section>
+      <FavoriteButton accountId={accountId} />
       {(playerMeta?.stale || playerMeta?.coverage === "partial" || playerMeta?.coverage === "unknown") && (
         <div className="notice notice-muted" role="status">
           {playerMeta.coverage === "unknown" ? "Источник может содержать не все матчи. Время обновления — время загрузки доступных данных." : playerMeta.stale ? "Показаны сохранённые данные; история может быть устаревшей." : "Показана доступная часть истории."}
@@ -270,8 +294,8 @@ export function PlayerProfile({ accountId }: { accountId: string }) {
               {heroes.map((hero) => <option key={hero.hero_id} value={hero.hero_id}>{hero.name}</option>)}
             </select>
           </label>
-          <label>С даты (UTC)<input aria-label="С даты" type="date" value={draftFrom} onChange={(event) => setDraftFrom(event.target.value)} /></label>
-          <label>По дату (UTC)<input aria-label="По дату" type="date" value={draftTo} onChange={(event) => setDraftTo(event.target.value)} /></label>
+          <label>С даты (UTC)<input aria-label="С даты" type="date" value={draftFrom} onChange={(event) => { userInteracted.current = true; setDraftFrom(event.target.value); }} /></label>
+          <label>По дату (UTC)<input aria-label="По дату" type="date" value={draftTo} onChange={(event) => { userInteracted.current = true; setDraftTo(event.target.value); }} /></label>
           <button className="button button-secondary filter-submit" type="submit">Применить</button>
         </form>
         {filterError && <p className="error-copy" role="alert">{filterError}</p>}

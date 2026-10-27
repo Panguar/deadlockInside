@@ -133,6 +133,6 @@ export function formatDuration(value: number | null) {
 }
 
 export function sourceDescription(meta: ApiMeta) {
-  const source = meta.source === "database" ? "База Deadlock Inside" : meta.source;
+  const source = meta.source === "database" ? "База Deadlock Inside" : meta.source === "steam" ? "Steam" : meta.source;
   return `${source} · выборка ${formatNumber(meta.sample_size, 0)} · обновлено ${formatDate(meta.updated_at)}`;
 }

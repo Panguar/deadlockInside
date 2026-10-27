@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
+import { AccountProvider } from "@/components/AccountProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,14 +12,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru" data-scroll-behavior="smooth">
       <body>
-        <div className="site-shell">
-          <SiteHeader />
-          <main>{children}</main>
-          <footer className="site-footer">
-            <span>DEADLOCK INSIDE</span>
-            <span>Данные зависят от доступной истории матчей.</span>
-          </footer>
-        </div>
+        <AccountProvider>
+          <div className="site-shell">
+            <SiteHeader />
+            <main>{children}</main>
+            <footer className="site-footer">
+              <span>DEADLOCK INSIDE</span>
+              <span>Данные зависят от доступной истории матчей.</span>
+            </footer>
+          </div>
+        </AccountProvider>
       </body>
     </html>
   );

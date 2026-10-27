@@ -1,5 +1,6 @@
 import { HeroBoard } from "@/components/HeroBoard";
 import { PlayerSearch } from "@/components/PlayerSearch";
+import { CommunityPanel } from "@/components/CommunityPanel";
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ export default function HomePage() {
         <div><span>02</span><p>Сравните матчи и героев</p></div>
         <div><span>03</span><p>Откройте состав матча</p></div>
       </section>
+      <CommunityPanel />
       <HeroBoard compact />
     </div>
   );

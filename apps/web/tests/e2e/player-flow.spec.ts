@@ -117,6 +117,9 @@ async function mockProfileFlow(
     const path = url.pathname;
     const method = route.request().method();
     const response = (json: unknown, status = 200) => route.fulfill({ status, json });
+    if (path === "/api/v1/auth/me") return response(envelope(null));
+    if (path === "/api/v1/community/online") return response(envelope({ player_count: 1234 }));
+    if (path === "/api/v1/community/news") return response(envelope([]));
     if (path === "/api/v1/players/search") {
       return response(envelope([
         { account_id: accountId, personaname: "Alex", avatar_url: null },

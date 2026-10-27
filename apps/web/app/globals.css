@@ -232,6 +232,37 @@ main { flex: 1; }
 .hero-stat-grid { margin-top: 24px; }
 .hero-detail-page .notice { margin-top: 30px; }
 
+.account-menu { position: relative; color: var(--ink); font-size: 12px; }
+.account-menu summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; max-width: 220px; }
+.account-menu summary img, .favorite-row img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: var(--surface-raised); }
+.account-menu summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu-panel { position: absolute; z-index: 8; top: calc(100% + 9px); right: 0; display: grid; min-width: 150px; padding: 7px; gap: 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-raised); box-shadow: 0 12px 32px #0008; }
+.account-menu-panel a, .account-menu-panel button { padding: 8px; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.account-menu-panel a:hover, .account-menu-panel button:hover { background: var(--surface-hover); }
+.community-panel { display: grid; grid-template-columns: minmax(210px, .72fr) minmax(0, 1.8fr); gap: 13px; margin: 37px 0 50px; }
+.community-online, .community-news { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 20px; }
+.community-online { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.community-online strong { margin-top: 17px; color: var(--olive-bright); font-size: clamp(30px, 4vw, 48px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.community-online > span:not(.eyebrow) { color: var(--ink-soft); }
+.community-online small, .community-news small { margin-top: 12px; color: var(--muted); font-size: 10px; }
+.community-news .section-heading { margin-bottom: 14px; }
+.community-news h2 { margin: 4px 0; font-size: 22px; }
+.community-news ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.community-news li { min-width: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+.community-news time { color: var(--muted); font-size: 10px; }
+.community-news h3 { margin: 3px 0; font-size: 13px; }
+.community-news h3 a:hover { color: var(--olive-bright); }
+.community-news p { display: -webkit-box; overflow: hidden; margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.period-setting { display: flex; align-items: center; gap: 12px; color: var(--ink-soft); }
+.period-setting select { min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); color: var(--ink); }
+.favorite-list { display: grid; gap: 9px; margin-top: 18px; }
+.favorite-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; padding: 12px 15px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.favorite-row > a { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.favorite-row > a span { display: grid; min-width: 0; }
+.favorite-row strong { overflow-wrap: anywhere; } .favorite-row small { color: var(--muted); font-size: 10px; }
+.favorite-control { display: flex; align-items: center; gap: 12px; margin: 14px 0 24px; flex-wrap: wrap; }
+.favorite-control > span { color: var(--rust); font-size: 11px; }
+@media (max-width: 600px) { .main-nav { gap: 10px; } .account-menu summary { max-width: 95px; gap: 5px; font-size: 10px; } .account-menu summary img { width: 24px; height: 24px; } .sign-in-link { padding: 0 8px; font-size: 10px; white-space: nowrap; } .community-panel { grid-template-columns: 1fr; margin: 24px 0 39px; } .community-online { min-height: 155px; } .community-news, .community-online { padding: 15px; } .period-setting { align-items: flex-start; flex-direction: column; } .period-setting select { width: 100%; } .favorite-row { padding: 10px; } .favorite-row .button { padding: 0 9px; font-size: 10px; } }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 :focus-visible { outline: 2px solid var(--olive-bright); outline-offset: 3px; }
 

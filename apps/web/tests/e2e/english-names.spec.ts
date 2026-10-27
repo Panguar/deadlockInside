@@ -25,6 +25,7 @@ test("hero analytics and detail show verified English names beneath Russian name
   await page.route("https://assets-bucket.deadlock-api.com/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWioAAAAASUVORK5CYII=", "base64") }));
   await page.route("**/api/v1/**", async (route) => {
     const { pathname } = new URL(route.request().url());
+    if (pathname === "/api/v1/auth/me") return route.fulfill({ json: envelope(null) });
     if (pathname === "/api/v1/heroes/stats") {
       return route.fulfill({
         json: envelope(heroes.map((hero) => ({
