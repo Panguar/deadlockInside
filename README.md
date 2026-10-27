@@ -56,6 +56,23 @@ docker run --rm \
 
 Smoke запускает изолированный Compose с fixture override и проходит поиск → профиль → матч; синтетические ID существуют только в этой локальной проверке. Настоящее покрытие внешнего источника проверялось отдельно и не подменяется фикстурой.
 
+## Профили Steam
+
+Для прямого получения ника и аватара добавьте `STEAM_API_KEY` в локальный `.env`
+(для production Compose — `.env.production`) и пересоздайте API и worker.
+Для dev Compose: `docker compose up -d --build api worker`.
+Ключ можно получить на https://steamcommunity.com/dev/apikey; храните его только
+на сервере, не в `NEXT_PUBLIC_*` и не в репозитории.
+
+Поиск принимает account ID, Steam ID64, ник, HTTPS-ссылки
+`https://steamcommunity.com/profiles/<SteamID64>` и
+`https://steamcommunity.com/id/<имя>`. Последний вариант требует ключа Steam.
+Без ключа и при сбое получения профиля Steam используется Deadlock API.
+Ники ищутся через Deadlock API; ранг и матчи также остаются у этого поставщика.
+Профиль обновляется существующей операцией refresh, чтение страницы использует БД.
+
+Методы: [Steam ISteamUser](https://partner.steamgames.com/doc/webapi/ISteamUser).
+
 ## Документы
 
 - [Архитектура и границы первого релиза](docs/superpowers/specs/2026-10-18-deadlock-inside-design.md)

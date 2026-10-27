@@ -35,6 +35,7 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-deadlock}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-deadlock}
       REDIS_URL: redis://redis:6379/0
       DEPENDENCY_TIMEOUT_SECONDS: ${DEPENDENCY_TIMEOUT_SECONDS:-2}
+      STEAM_API_KEY: ${STEAM_API_KEY:-}
     command: ["alembic", "upgrade", "head"]
     depends_on:
       postgres:

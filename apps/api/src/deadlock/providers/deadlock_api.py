@@ -54,13 +54,42 @@ def _retry_after(value: str | None) -> float | None:
 
 class DeadlockProvider:
     def __init__(self, base_url: str = "https://api.deadlock-api.com/v1", *, limiter,
-                 client: httpx.Client | None = None, before_request: Callable[[], None] | None = None):
+                 client: httpx.Client | None = None, before_request: Callable[[], None] | None = None,
+                 steam=None, steam_api_key: str | None = None):
         self.base_url = base_url.rstrip("/")
         self.limiter = limiter
         self.before_request = before_request
         self.api_key = os.environ.get("DEADLOCK_API_KEY")
         self.client = client or httpx.Client(timeout=httpx.Timeout(20, connect=3), follow_redirects=False)
         self.last_history_stale = False
+        from deadlock.providers.steam import SteamProvider
+        steam_key = (steam_api_key if steam_api_key is not None else os.environ.get("STEAM_API_KEY", "")).strip()
+        self.steam = steam if steam is not None else (SteamProvider(steam_key) if steam_key else None)
+
+    def close(self):
+        self.client.close()
+        if self.steam is not None:
+            self.steam.client.close()
+
+    def _steam_call(self, method, value):
+        if self.before_request:
+            self.before_request()
+        token = self.limiter.acquire("steam")
+        try:
+            with self._keep_lock(token):
+                return method(value)
+        finally:
+            if token is not None:
+                self.limiter.release(token)
+
+    def resolve_profile_url(self, query: str) -> int:
+        from deadlock.providers.steam import parse_profile_url
+        identifier = parse_profile_url(query)
+        if isinstance(identifier, int):
+            return identifier
+        if self.steam is None:
+            raise ProviderUnavailable("steam_not_configured")
+        return self._steam_call(self.steam.resolve_vanity, identifier)
 
     @staticmethod
     def _check_id(value: int, *, account: bool = False) -> None:
@@ -140,6 +169,20 @@ class DeadlockProvider:
 
     def fetch_player(self, account_id: int) -> ProviderPlayer:
         self._check_id(account_id, account=True)
+        if self.steam is not None:
+            try:
+                player = self._steam_call(self.steam.fetch_player, account_id)
+            except (ProviderUnavailable, ProviderBadResponse, ProviderNotFound):
+                pass
+            else:
+                from deadlock.providers.limiter import RateLimitUnavailable
+                try:
+                    rank = self._get(f"/players/{account_id}/rank")
+                    badge = rank.get("badge") if isinstance(rank, dict) else None
+                    player.rank_badge = badge if type(badge) is int and badge > 0 else None
+                except (ProviderError, RateLimitDeferred, RateLimitUnavailable):
+                    pass
+                return player
         payload = self._get("/players/steam", params={"account_ids": account_id})
         if not isinstance(payload, list):
             raise ProviderBadResponse("provider player response must be an array")

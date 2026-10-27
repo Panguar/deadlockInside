@@ -33,6 +33,7 @@ class PlayerCandidate(ProviderSchema):
 
 
 class ProviderPlayer(PlayerCandidate):
+    profile_source: str = "deadlock-api"
     rank_badge: int | None = None
     profile_updated_at: datetime | None = None
 

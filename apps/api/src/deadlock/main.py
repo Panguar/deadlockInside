@@ -31,14 +31,17 @@ def create_app() -> FastAPI:
         app.state.engine = engine
         app.state.redis = redis
         app.state.settings = settings
-        app.state.provider = DeadlockProvider(
+        provider = DeadlockProvider(
             os.environ.get("DEADLOCK_API_BASE_URL", "https://api.deadlock-api.com/v1"),
             limiter=RedisRateLimiter(redis),
+            steam_api_key=settings.steam_api_key.get_secret_value(),
         )
+        app.state.provider = provider
         app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
         try:
             yield
         finally:
+            provider.close()
             redis.close()
             engine.dispose()
 

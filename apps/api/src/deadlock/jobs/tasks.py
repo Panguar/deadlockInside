@@ -37,7 +37,8 @@ def _dependencies():
 def refresh_player_task(self, job_id: str):
     engine, session_factory, redis = _dependencies()
     provider = DeadlockProvider(os.environ.get("DEADLOCK_API_BASE_URL", "https://api.deadlock-api.com/v1"),
-                               limiter=RedisRateLimiter(redis))
+                               limiter=RedisRateLimiter(redis),
+                               steam_api_key=Settings().steam_api_key.get_secret_value())
     try:
         try:
             with session_factory() as session:
@@ -49,6 +50,7 @@ def refresh_player_task(self, job_id: str):
         except RefreshRetryScheduled as exc:
             raise self.retry(exc=exc, countdown=exc.countdown)
     finally:
+        provider.close()
         redis.close()
         engine.dispose()
 

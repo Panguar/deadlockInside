@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     database_url: SecretStr
     redis_url: SecretStr
+    steam_api_key: SecretStr = SecretStr("")
     dependency_timeout_seconds: int = Field(default=2, ge=1, le=10)
     trusted_proxy_networks: list[str] = Field(default_factory=list)
 

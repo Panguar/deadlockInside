@@ -55,8 +55,13 @@ def search_players(request: Request, q: str = Query(..., min_length=1, max_lengt
     if not 2 <= len(query) <= 100:
         return error_response(request, 422, "validation_error", "Search text must contain 2 to 100 characters")
     lowered = query.lower()
+    parsed_id = None
     if "://" in lowered or "/" in query or "\\" in query:
-        return error_response(request, 422, "validation_error", "Profile URLs are not supported")
+        from deadlock.providers.steam import parse_profile_url
+        try:
+            parse_profile_url(query)
+        except ValueError:
+            return error_response(request, 422, "validation_error", "Steam profile URL is invalid")
 
     digest = sha256(query.casefold().encode("utf-8")).hexdigest()
     cache_key = f"api:search:{digest}"
@@ -78,7 +83,10 @@ def search_players(request: Request, q: str = Query(..., min_length=1, max_lengt
         except (ValueError, TypeError, KeyError):
             cached_rows = None
     try:
-        parsed_id = _account_id(query) if query.isdecimal() else None
+        if "://" in lowered:
+            parsed_id = request.app.state.provider.resolve_profile_url(query)
+        else:
+            parsed_id = _account_id(query) if query.isdecimal() else None
         if parsed_id is not None:
             player = request.app.state.provider.fetch_player(parsed_id)
             candidates = [player]
@@ -103,7 +111,8 @@ def search_players(request: Request, q: str = Query(..., min_length=1, max_lengt
                                                            separators=(",", ":")), ex=300)
     except Exception:
         pass
-    return {"data": rows, "meta": ApiMeta(source="deadlock-api", updated_at=updated_at,
+    source = getattr(candidates[0], "profile_source", "deadlock-api") if parsed_id is not None and candidates else "deadlock-api"
+    return {"data": rows, "meta": ApiMeta(source=source, updated_at=updated_at,
                                            sample_size=len(rows), coverage="unknown")}
 
 

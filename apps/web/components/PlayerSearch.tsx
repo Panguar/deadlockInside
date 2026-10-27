@@ -86,7 +86,7 @@ export function PlayerSearch() {
           aria-controls="player-results"
           aria-autocomplete="list"
           aria-activedescendant={activeIndex >= 0 ? `player-option-${activeIndex}` : undefined}
-          placeholder="Ник, account ID или Steam ID64"
+          placeholder="Ник, Steam ID или ссылка на профиль"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={onKeyDown}
@@ -120,7 +120,7 @@ export function PlayerSearch() {
           ))}
         </ul>
       )}
-      <p className="search-hint">Например, имя или длинный Steam ID. Выберите нужный профиль из списка.</p>
+      <p className="search-hint">Введите ник, account ID, Steam ID64 или ссылку steamcommunity.com. Выберите нужный профиль из списка.</p>
     </div>
   );
 }
