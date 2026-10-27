@@ -32,6 +32,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       DEPENDENCY_TIMEOUT_SECONDS: ${DEPENDENCY_TIMEOUT_SECONDS:-2}
       STEAM_API_KEY: ${STEAM_API_KEY:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?Set PUBLIC_BASE_URL to the public HTTPS origin}
       TRUSTED_PROXY_NETWORKS: ${TRUSTED_PROXY_NETWORKS:-[]}
     command: ["alembic", "upgrade", "head"]
     depends_on:

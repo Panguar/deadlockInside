@@ -37,11 +37,15 @@ def create_app() -> FastAPI:
             steam_api_key=settings.steam_api_key.get_secret_value(),
         )
         app.state.provider = provider
+        from deadlock.providers.steam import SteamProvider
+        steam_provider = SteamProvider(settings.steam_api_key.get_secret_value())
+        app.state.steam_provider = steam_provider
         app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
         try:
             yield
         finally:
             provider.close()
+            steam_provider.client.close()
             redis.close()
             engine.dispose()
 
@@ -54,6 +58,10 @@ def create_app() -> FastAPI:
         request.state.request_id = str(uuid4())
         response = await call_next(request)
         response.headers["X-Request-ID"] = request.state.request_id
+        if request.url.path.startswith(("/api/v1/auth", "/api/v1/account")):
+            response.headers["Cache-Control"] = "no-store"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
         return response
 
     @app.get("/health/live", tags=["health"])
@@ -74,8 +82,10 @@ def create_app() -> FastAPI:
     from deadlock.heroes.router import router as heroes_router
     from deadlock.matches.router import router as matches_router
     from deadlock.players.router import router as players_router
+    from deadlock.auth.router import router as auth_router
 
     app.include_router(players_router, prefix="/api/v1")
+    app.include_router(auth_router, prefix="/api/v1")
     app.include_router(matches_router, prefix="/api/v1")
     app.include_router(jobs_router, prefix="/api/v1")
     app.include_router(heroes_router, prefix="/api/v1")
