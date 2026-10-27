@@ -82,9 +82,11 @@ def create_app() -> FastAPI:
     from deadlock.heroes.router import router as heroes_router
     from deadlock.matches.router import router as matches_router
     from deadlock.players.router import router as players_router
+    from deadlock.community.router import router as community_router
     from deadlock.auth.router import router as auth_router
 
     app.include_router(players_router, prefix="/api/v1")
+    app.include_router(community_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(matches_router, prefix="/api/v1")
     app.include_router(jobs_router, prefix="/api/v1")

@@ -197,7 +197,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "maximum": 9223372036854776000,
+                  "maximum": 9223372036854775807,
                   "exclusiveMinimum": 0
                 },
                 {
@@ -329,7 +329,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "maximum": 9223372036854776000,
+                  "maximum": 9223372036854775807,
                   "exclusiveMinimum": 0
                 },
                 {
@@ -476,6 +476,279 @@
               }
             },
             "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/community/online": {
+      "get": {
+        "tags": [
+          "community"
+        ],
+        "summary": "Online",
+        "operationId": "online_api_v1_community_online_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_OnlineOut_"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/community/news": {
+      "get": {
+        "tags": [
+          "community"
+        ],
+        "summary": "News",
+        "operationId": "news_api_v1_community_news_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_list_NewsItemOut__"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "get": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Login",
+        "operationId": "login_api_v1_auth_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/callback": {
+      "get": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Callback",
+        "operationId": "callback_api_v1_auth_callback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Me",
+        "operationId": "me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/account/favorites": {
+      "get": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Favorites",
+        "operationId": "favorites_api_v1_account_favorites_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Add Favorite",
+        "operationId": "add_favorite_api_v1_account_favorites_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/account/favorites/{account_id}": {
+      "delete": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Remove Favorite",
+        "operationId": "remove_favorite_api_v1_account_favorites__account_id__delete",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Account Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/account/preferences": {
+      "patch": {
+        "tags": [
+          "auth",
+          "account"
+        ],
+        "summary": "Update Preferences",
+        "operationId": "update_preferences_api_v1_account_preferences_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
@@ -878,6 +1151,35 @@
         ],
         "title": "ApiMeta"
       },
+      "CommunityMeta": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "steam"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "sample_size": {
+            "type": "integer",
+            "title": "Sample Size",
+            "default": 0
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "updated_at"
+        ],
+        "title": "CommunityMeta"
+      },
       "Envelope_HeroDetailOut_": {
         "properties": {
           "data": {
@@ -909,6 +1211,22 @@
           "meta"
         ],
         "title": "Envelope[JobOut]"
+      },
+      "Envelope_OnlineOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OnlineOut"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CommunityMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "Envelope[OnlineOut]"
       },
       "Envelope_PlayerOut_": {
         "properties": {
@@ -1042,6 +1360,26 @@
         ],
         "title": "Envelope[list[MatchHistoryItem]]"
       },
+      "Envelope_list_NewsItemOut__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/NewsItemOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CommunityMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "Envelope[list[NewsItemOut]]"
+      },
       "Envelope_list_PlayerCandidateOut__": {
         "properties": {
           "data": {
@@ -1096,6 +1434,33 @@
           "error"
         ],
         "title": "ErrorEnvelope"
+      },
+      "FavoriteBody": {
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "pattern": "^[0-9]{1,10}$",
+            "title": "Account Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id"
+        ],
+        "title": "FavoriteBody"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "HeroDetailOut": {
         "properties": {
@@ -1683,6 +2048,53 @@
         ],
         "title": "MatchPlayerOut"
       },
+      "NewsItemOut": {
+        "properties": {
+          "gid": {
+            "type": "string",
+            "title": "Gid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "excerpt": {
+            "type": "string",
+            "title": "Excerpt"
+          }
+        },
+        "type": "object",
+        "required": [
+          "gid",
+          "title",
+          "url",
+          "date",
+          "excerpt"
+        ],
+        "title": "NewsItemOut"
+      },
+      "OnlineOut": {
+        "properties": {
+          "player_count": {
+            "type": "integer",
+            "title": "Player Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "player_count"
+        ],
+        "title": "OnlineOut"
+      },
       "PlayerCandidateOut": {
         "properties": {
           "account_id": {
@@ -1888,6 +2300,20 @@
         ],
         "title": "PlayerStatsOut"
       },
+      "PreferenceBody": {
+        "properties": {
+          "default_period": {
+            "type": "string",
+            "pattern": "^(7|30|90|all)$",
+            "title": "Default Period"
+          }
+        },
+        "type": "object",
+        "required": [
+          "default_period"
+        ],
+        "title": "PreferenceBody"
+      },
       "RefreshAccepted": {
         "properties": {
           "job_id": {
@@ -1900,6 +2326,46 @@
           "job_id"
         ],
         "title": "RefreshAccepted"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }
