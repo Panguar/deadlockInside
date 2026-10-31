@@ -1,4 +1,3 @@
-import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AccountProvider } from "@/components/AccountProvider";
@@ -23,7 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="site-shell">
             <SiteHeader />
             <main>
-              <ViewTransition default="page">{children}</ViewTransition>
+              {children}
             </main>
             <footer className="site-plaque">
               <div className="plaque-plate">
