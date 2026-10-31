@@ -1,31 +1,47 @@
-import { HeroBoard } from "@/components/HeroBoard";
+import "./home/hero.css";
 import { PlayerSearch } from "@/components/PlayerSearch";
-import { CommunityPanel } from "@/components/CommunityPanel";
+import { Reliquary } from "@/components/home/Reliquary";
+import { SmoothScroll } from "@/components/home/SmoothScroll";
+import { MetaSection } from "@/components/home/MetaSection";
+import { HeroGallery } from "@/components/home/HeroGallery";
+import { WorkshopSection } from "@/components/home/WorkshopSection";
+import { ProfileSection } from "@/components/home/ProfileSection";
+
+const PARTS = [
+  { key: "crown" as const, label: "Мета патча", href: "#meta" },
+  { key: "rays" as const, label: "Герои", href: "#heroes" },
+  { key: "gears" as const, label: "Билды", href: "#workshop" },
+  { key: "dial" as const, label: "Матчи и лидерборд", href: "#workshop" },
+  { key: "plinth" as const, label: "Ваш профиль", href: "#profile" },
+];
 
 export default function HomePage() {
   return (
-    <div className="page-content home-page">
-      <section className="home-hero">
-        <div className="hero-copy">
-          <span className="eyebrow"><span className="live-dot" /> АНАЛИТИКА МАТЧЕЙ DEADLOCK</span>
-          <h1>Каждый матч<br /><em>рассказывает больше.</em></h1>
-          <p>История игрока и общая статистика героев — по фактически сохранённым матчам и данным источника.</p>
-          <PlayerSearch />
+    <div className="home">
+      <SmoothScroll />
+      <div className="home-stage-track">
+        <div className="home-stage-layer">
+          <Reliquary parts={PARTS} />
         </div>
-        <div className="deco-emblem" aria-hidden="true">
-          <div className="emblem-rays" />
-          <div className="emblem-ring"><div className="emblem-core"><span>DI</span></div></div>
-          <span className="art-tag tag-top">MATCH / 01</span>
-          <span className="art-tag tag-bottom">STATS LIVE</span>
-        </div>
-      </section>
-      <section className="home-guide" aria-label="Как это работает">
-        <div><span>01</span><p>Найдите игрока по имени или ID</p></div>
-        <div><span>02</span><p>Сравните матчи и героев</p></div>
-        <div><span>03</span><p>Откройте состав матча</p></div>
-      </section>
-      <CommunityPanel />
-      <HeroBoard compact />
+        <section id="top" className="home-hero" aria-labelledby="home-title">
+          <div className="container home-hero-inner">
+            <div className="home-hero-copy">
+              <h1 id="home-title" className="home-wordmark">Deadlock<br />Insight</h1>
+              <p className="home-lede">Герои, матчи и игроки Deadlock по живым данным матчей.</p>
+              <PlayerSearch />
+            </div>
+          </div>
+        </section>
+        <section id="parts" className="home-parts" aria-labelledby="parts-title">
+          <div className="container">
+            <h2 id="parts-title" className="visually-hidden">Разбор механизма</h2>
+          </div>
+        </section>
+      </div>
+      <MetaSection />
+      <HeroGallery />
+      <WorkshopSection />
+      <ProfileSection />
     </div>
   );
 }

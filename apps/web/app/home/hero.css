@@ -1,0 +1,112 @@
+.home-stage-track {
+  position: relative;
+}
+
+.home-stage-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.home-stage-layer .reliquary-labels a {
+  pointer-events: auto;
+}
+
+.home-hero,
+.home-parts {
+  position: relative;
+  z-index: var(--z-raised);
+  pointer-events: none;
+}
+
+.home-hero {
+  min-height: calc(100svh - var(--nav-height));
+  display: grid;
+  align-items: center;
+  padding-block: var(--space-xl);
+}
+
+.home-hero-inner {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.home-hero-copy {
+  grid-column: 1 / span 6;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+html.js .home-hero-copy > * {
+  animation: home-hero-enter 420ms var(--ease-out) both;
+}
+
+html.js .home-hero-copy > :nth-child(1) { animation-delay: 0ms; }
+html.js .home-hero-copy > :nth-child(2) { animation-delay: 60ms; }
+html.js .home-hero-copy > :nth-child(3) { animation-delay: 120ms; }
+
+@keyframes home-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.home-wordmark {
+  font-family: var(--font-outlier);
+  font-size: clamp(3rem, 4.6vw + 0.5rem, 6.25rem);
+  line-height: 1.02;
+  font-weight: 400;
+  color: var(--color-ink);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  min-width: 0;
+  margin-bottom: var(--space-md);
+}
+
+.home-lede {
+  font-family: var(--font-body);
+  font-size: var(--text-lead);
+  color: var(--color-ink-2);
+  max-width: 34ch;
+  margin-bottom: var(--space-lg);
+}
+
+.home-parts {
+  height: 220svh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .home-hero-copy > * {
+    animation: none;
+  }
+}
+
+@media (max-width: 60rem) {
+  .home-hero {
+    align-items: end;
+    padding-bottom: var(--space-2xl);
+  }
+
+  .home-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-hero-copy {
+    grid-column: 1 / -1;
+    background: var(--color-paper);
+    padding: var(--space-lg);
+  }
+
+  .home-parts {
+    height: 160svh;
+  }
+}
