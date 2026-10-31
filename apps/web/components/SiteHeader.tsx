@@ -46,7 +46,10 @@ export function SiteHeader() {
             </div>
           </details>
         ) : (
-          <a className="button button-secondary sign-in-link" href="/api/v1/auth/login">Войти через Steam</a>
+          <a className="button button-secondary sign-in-link" href="/api/v1/auth/login" aria-label="Войти через Steam">
+            <span className="sign-in-full">Войти через Steam</span>
+            <span className="sign-in-short" aria-hidden="true">Войти</span>
+          </a>
         )}
         {logoutError && <span className="error-copy" role="alert">{logoutError}</span>}
       </nav>
