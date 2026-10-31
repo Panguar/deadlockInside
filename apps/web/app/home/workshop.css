@@ -100,26 +100,45 @@
   gap: var(--space-xs);
   padding-block: var(--space-md);
   color: var(--color-ink);
-  text-decoration: none;
   min-width: 0;
+}
+
+.workshop-news-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--color-ink);
+  overflow-wrap: break-word;
+}
+
+.workshop-news-title a {
+  color: inherit;
+  text-decoration: none;
   transition: color 120ms var(--ease-out);
 }
 
-.workshop-news-link:hover {
+.workshop-news-title a:hover {
   color: var(--color-accent-hi);
 }
 
-.workshop-news-link:focus-visible,
+.workshop-news-title a:focus-visible,
 .workshop-retry:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-.workshop-news-title {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: var(--text-md);
+.workshop-news-excerpt {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
   overflow-wrap: break-word;
+}
+
+.workshop-stale-note {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
 }
 
 .workshop-news-date {
@@ -177,7 +196,8 @@
 }
 
 @media (pointer: coarse) {
-  .workshop-news-link {
+  .workshop-news-title a {
+    display: inline-block;
     min-height: 44px;
   }
 }
@@ -191,7 +211,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .workshop-news-link,
+  .workshop-news-title a,
   .workshop-retry {
     transition: none;
   }

@@ -20,8 +20,10 @@ function safeNewsUrl(value: string) {
 
 export function WorkshopSection() {
   const [online, setOnline] = useState<number | null>(null);
+  const [onlineStale, setOnlineStale] = useState(false);
   const [onlineState, setOnlineState] = useState<"loading" | "ready" | "error">("loading");
   const [news, setNews] = useState<News[]>([]);
+  const [newsStale, setNewsStale] = useState(false);
   const [newsState, setNewsState] = useState<"loading" | "ready" | "error">("loading");
   const [newsAttempt, setNewsAttempt] = useState(0);
   const titleRef = useReveal<HTMLHeadingElement>();
@@ -32,6 +34,7 @@ export function WorkshopSection() {
       .then((result) => {
         if (alive) {
           setOnline(result.data.player_count);
+          setOnlineStale(result.meta.stale === true);
           setOnlineState("ready");
         }
       })
@@ -45,10 +48,12 @@ export function WorkshopSection() {
 
   useEffect(() => {
     let alive = true;
+    setNewsStale(false);
     apiRequest<News[]>("/api/v1/community/news")
       .then((result) => {
         if (alive) {
           setNews(result.data.slice(0, 4));
+          setNewsStale(result.meta.stale === true);
           setNewsState("ready");
         }
       })
@@ -85,6 +90,9 @@ export function WorkshopSection() {
                   <CountUp value={online} format={(n) => new Intl.NumberFormat("ru-RU").format(Math.round(n))} />
                 </span>
                 <span className="workshop-online-caption">игроков онлайн по данным Steam</span>
+                {onlineStale && (
+                  <span className="workshop-stale-note">Последнее известное значение · устарело</span>
+                )}
               </p>
             ) : onlineState === "error" ? (
               <p role="status" className="workshop-status">
@@ -113,6 +121,7 @@ export function WorkshopSection() {
                   className="workshop-retry"
                   onClick={() => {
                     setNewsState("loading");
+                    setNewsStale(false);
                     setNewsAttempt((value) => value + 1);
                   }}
                 >
@@ -125,32 +134,30 @@ export function WorkshopSection() {
               <ul className="workshop-news-list">
                 {news.map((item) => {
                   const href = safeNewsUrl(item.url);
-                  const content = (
-                    <>
-                      <span className="workshop-news-title">{item.title}</span>
-                      <time className="workshop-news-date" dateTime={item.date}>
-                        {formatDate(item.date)}
-                      </time>
-                    </>
-                  );
                   return (
                     <li key={item.gid} className="workshop-news-item">
-                      {href ? (
-                        <a
-                          className="workshop-news-link"
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {content}
-                        </a>
-                      ) : (
-                        <div className="workshop-news-link">{content}</div>
-                      )}
+                      <div className="workshop-news-link">
+                        <time className="workshop-news-date" dateTime={item.date}>
+                          {formatDate(item.date)}
+                        </time>
+                        <h4 className="workshop-news-title">
+                          {href ? (
+                            <a href={href} target="_blank" rel="noopener noreferrer">
+                              {item.title}
+                            </a>
+                          ) : (
+                            item.title
+                          )}
+                        </h4>
+                        <p className="workshop-news-excerpt">{item.excerpt}</p>
+                      </div>
                     </li>
                   );
                 })}
               </ul>
+            )}
+            {newsState === "ready" && newsStale && (
+              <small className="workshop-stale-note">Показана сохранённая лента · устарела</small>
             )}
           </div>
         </div>
