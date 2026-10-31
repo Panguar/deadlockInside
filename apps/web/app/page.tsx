@@ -12,10 +12,11 @@ export default function HomePage() {
           <p>История игрока и общая статистика героев — по фактически сохранённым матчам и данным источника.</p>
           <PlayerSearch />
         </div>
-        <div className="orbital-art" aria-hidden="true">
-          <div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orbit orbit-three" />
-          <div className="core-mark"><span>DI</span><i /><b /></div>
-          <span className="art-tag tag-top">MATCH / 01</span><span className="art-tag tag-bottom">STATS LIVE</span>
+        <div className="deco-emblem" aria-hidden="true">
+          <div className="emblem-rays" />
+          <div className="emblem-ring"><div className="emblem-core"><span>DI</span></div></div>
+          <span className="art-tag tag-top">MATCH / 01</span>
+          <span className="art-tag tag-bottom">STATS LIVE</span>
         </div>
       </section>
       <section className="home-guide" aria-label="Как это работает">
