@@ -1,3 +1,13 @@
+# Impeccable audit: Patron scene (2026-10-31, second pass)
+
+Detectors: no new findings (hidden-at-rest = hover tags and stage labels, needle overshoot waived, sloplint 20 is the multi-file stamp quirk). Visual review at 1440x900 and 375x812, GPU and still-image paths:
+
+- **[P1] Mobile header overflows:** at 375px "Войти через Steam" is cut off at the right edge. Shorten to "Войти" under 40rem (keep the full accessible name), shrink the wordmark one step.
+- **[P2] Walkers read as plain grey boxes:** the strongest Deadlock reference is the weakest silhouette. Add brass edge trims, larger brass pauldrons, a clearly lit visor slit, patina knee plates.
+- **[P2] Sunburst crown renders dark brown,** not brass (blades too rough/dark, single-sided). Brighter brass, double-sided.
+- **[P2] The Patron's core light barely leaks** through its faces; the scene's hero lacks its light source. Stronger inner emissive, wider face gaps.
+- **[P3] Soul orbs drift below the plinth** on desktop and read as stray dots. Keep orbits above y 0.3.
+
 # Impeccable audit: home page (2026-10-31)
 
 Target: `/` at 1280x800, 1440x900 and 375x812 (emulated viewport, Chromium). Detectors: `impeccable detect` (URL + sources), Hallmark `sloplint` (static tier; render tier did not run, no puppeteer). Manual: contrast sweep over every visible text node, touch-target sweep, brief bans grep.
