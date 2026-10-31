@@ -97,3 +97,24 @@ def test_response_size_limit(monkeypatch):
     monkeypatch.setattr(httpx, "Client", Client)
     with pytest.raises(CommunityUnavailable):
         service._request_json("news", {})
+
+def test_news_excerpt_drops_steam_image_markup():
+    assert service.plain_text("Intro [img]{STEAM_CLAN_IMAGE}/45164767/abc.png[/img] text") == "Intro text"
+    assert service.plain_text('[img src="{STEAM_CLAN_LOC_IMAGE}/1/x.jpg"][/img]Patch notes') == "Patch notes"
+    assert service.plain_text("See {STEAM_CLAN_LOC_IMAGE}/45164767/6073.png now") == "See now"
+    assert service.plain_text("[url=https://store.steampowered.com/app/1422450]Read more[/url]") == "Read more"
+    assert service.plain_text("[IMG]{STEAM_CLAN_IMAGE}/a.png[/IMG]") == ""
+
+def test_plain_text_is_fast_on_pathological_input():
+    import time
+    value = "[img]" * 500 + "[" * 8000 + "[img " * 1000 + "{STEAM_CLAN_IMAGE}x" * 500
+    start = time.perf_counter()
+    result = service.plain_text(value)
+    elapsed = time.perf_counter() - start
+    assert isinstance(result, str)
+    assert elapsed < 2.0
+    start = time.perf_counter()
+    result = service.plain_text("[" * 20000)
+    elapsed = time.perf_counter() - start
+    assert isinstance(result, str)
+    assert elapsed < 2.0

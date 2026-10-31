@@ -12,6 +12,9 @@ ONLINE_TTL, NEWS_TTL, STALE_TTL, LOCK_TTL = 60, 900, 86400, 10
 BASE = "https://api.steampowered.com"
 NEWS_FEED = "steam_community_announcements"
 _TAGS, _SPACE = re.compile(r"\[[^\]]*\]"), re.compile(r"\s+")
+_IMG_BLOCK = re.compile(r"\[img\b[^\]]{0,200}\].{0,500}?\[/img\]", re.IGNORECASE | re.DOTALL)
+_MAX_INPUT = 20000
+_STEAM_TOKEN = re.compile(r"\{STEAM_CLAN[A-Z_]*\}\S*")
 _ALLOWED_NEWS_HOSTS = {"steamcommunity.com", "store.steampowered.com", "steamstore-a.akamaihd.net"}
 
 class CommunityUnavailable(Exception):
@@ -25,6 +28,7 @@ class _TextExtractor(HTMLParser):
         self.parts.append(data)
 
 def plain_text(value: str) -> str:
+    value = value[:_MAX_INPUT]
     parser = _TextExtractor()
     try:
         parser.feed(value)
@@ -32,7 +36,8 @@ def plain_text(value: str) -> str:
         text = " ".join(parser.parts)
     except (ValueError, AssertionError):
         text = value
-    return _SPACE.sub(" ", unescape(_TAGS.sub(" ", text))).strip()[:400]
+    text = _IMG_BLOCK.sub(" ", text)
+    return _SPACE.sub(" ", _STEAM_TOKEN.sub(" ", unescape(_TAGS.sub(" ", text)))).strip()[:400]
 
 def safe_news_url(value) -> str | None:
     if not isinstance(value, str) or len(value) > 2048:
