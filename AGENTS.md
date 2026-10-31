@@ -19,10 +19,10 @@ To get the most out of Anthropic prompt caching, all API requests must strictly 
   3. Generates a clear Technical Specification (Task) for the coder.
 - **Strict Constraints:**
   - NEVER write or generate production code yourself.
-  - NEVER read full source files longer than 50 lines. Delegate all code modifications to the Stage 2 coder (Haiku 5.5 subagent).
+  - NEVER read full source files longer than 50 lines. Delegate all code modifications to the Stage 2 coder (Sonnet 5.5 subagent).
 
-## STAGE 2: Haiku 5.5 (Executor / Coder)
-- **Model Target:** `claude-haiku-5-5`
+## STAGE 2: Sonnet 5.5 (Executor / Coder)
+- **Model Target:** `claude-sonnet-5-5`
 - **Configuration:** `effort: low` (deterministic, minimal output)
 - **Context Access:** Isolated subagent sandbox. Sees ONLY the specific target file and the atomic task from Stage 1.
 - **Action Workflow:**
