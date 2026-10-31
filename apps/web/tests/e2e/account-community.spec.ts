@@ -85,3 +85,11 @@ test("homepage shows stale community data and refuses unsafe news links", async 
   await expect(page.getByRole("link", { name: /Patch/ })).toHaveCount(0);
   await expect(page.getByText("Plain excerpt")).toBeVisible();
 });
+
+test("failed Steam sign in shows a recoverable notice on the homepage profile", async ({ page }) => {
+  await page.route("**/api/v1/auth/me", (route) => route.fulfill({ json: envelope(null) }));
+  await page.route("**/api/v1/community/online", (route) => route.fulfill({ json: envelope({ player_count: 4321 }) }));
+  await page.route("**/api/v1/community/news", (route) => route.fulfill({ json: envelope([]) }));
+  await page.goto("/?login_error=1#profile");
+  await expect(page.getByRole("alert").filter({ hasText: "Вход через Steam не завершился" })).toBeVisible();
+});

@@ -87,6 +87,22 @@ test("PATCH and DELETE methods and mutation bodies are forwarded", async () => {
   ]);
 });
 
+test("failed Steam callback redirects to the profile notice and forwards cookie clears", async () => {
+  const proxy = loadProxy(async () => new Response("{\"error\":{\"code\":\"request_failed\"}}", {
+    status: 400,
+    headers: [
+      ["content-type", "application/json"],
+      ["set-cookie", "steam_login_state=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"],
+    ],
+  }));
+  const result = await proxy.GET(request("GET", "https://web.example/api/v1/auth/callback?openid.mode=cancel"), context(["auth", "callback"]));
+  assert.equal(result.status, 303);
+  assert.equal(result.headers.get("location"), "https://web.example/?login_error=1#profile");
+  assert.equal(result.headers.get("cache-control"), "no-store");
+  assert.deepEqual(result.headers.getSetCookie(), ["steam_login_state=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"]);
+  assert.doesNotMatch(await result.text(), /request_failed/);
+});
+
 test("upstream failure returns a generic non-cached 502 without leaking the upstream URL", async () => {
   const proxy = loadProxy(async () => { throw new Error("failed at http://api.internal/private?token=secret"); });
   const result = await proxy.GET(request("GET", "https://web.example/api/v1/auth/me"), context(["auth", "me"]));

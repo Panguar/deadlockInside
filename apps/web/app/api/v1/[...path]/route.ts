@@ -5,8 +5,20 @@ export const dynamic = "force-dynamic";
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 
+function isSteamCallback(request: NextRequest, path: string[]) {
+  return request.method === "GET" && path.length === 2 && path[0] === "auth" && path[1] === "callback";
+}
+
+function callbackFailureRedirect(request: NextRequest, setCookies: string[] = []) {
+  const response = NextResponse.redirect(new URL("/?login_error=1#profile", request.nextUrl.origin), 303);
+  response.headers.set("cache-control", "no-store");
+  for (const cookie of setCookies) response.headers.append("set-cookie", cookie);
+  return response;
+}
+
 async function proxy(request: NextRequest, context: RouteContext) {
   const { path } = await context.params;
+  const steamCallback = isSteamCallback(request, path);
   const base = process.env.DEADLOCK_API_INTERNAL_URL ?? "http://127.0.0.1:8000";
   const upstream = new URL(
     `/api/v1/${path.map((segment) => encodeURIComponent(segment)).join("/")}${request.nextUrl.search}`,
@@ -27,6 +39,9 @@ async function proxy(request: NextRequest, context: RouteContext) {
       redirect: "manual",
       signal: AbortSignal.timeout(12_000),
     });
+    if (steamCallback && response.status >= 400) {
+      return callbackFailureRedirect(request, response.headers.getSetCookie());
+    }
     const responseHeaders = new Headers();
     const responseType = response.headers.get("content-type");
     const location = response.headers.get("location");
@@ -36,6 +51,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
     responseHeaders.set("cache-control", "no-store");
     return new NextResponse(response.body, { status: response.status, headers: responseHeaders });
   } catch {
+    if (steamCallback) return callbackFailureRedirect(request);
     return NextResponse.json(
       { error: { code: "api_unavailable", message: "Сервис статистики временно недоступен", request_id: "" } },
       { status: 502, headers: { "cache-control": "no-store" } },

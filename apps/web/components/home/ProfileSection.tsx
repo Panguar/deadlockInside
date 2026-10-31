@@ -21,6 +21,16 @@ export function ProfileSection() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
   const titleRef = useReveal<HTMLHeadingElement>();
+  const [loginError, setLoginError] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("login_error") !== "1") return;
+    setLoginError(true);
+    params.delete("login_error");
+    const search = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`);
+  }, []);
 
   useEffect(() => {
     if (!accountId) return;
@@ -53,6 +63,15 @@ export function ProfileSection() {
             <span className="profile-skeleton-line profile-skeleton-line-short" />
           </div>
         ) : !account ? (
+          <>
+          {loginError ? (
+            <div className="profile-login-error" role="alert">
+              <p className="profile-login-error-title">Вход через Steam не завершился</p>
+              <p className="profile-login-error-text">
+                Steam вернул вас без подтверждения входа. Откройте сайт по одному адресу и попробуйте снова.
+              </p>
+            </div>
+          ) : null}
           <div className="profile-signed-out">
             <div className="profile-copy">
               <p className="profile-lede">
@@ -102,6 +121,7 @@ export function ProfileSection() {
               </div>
             ) : null}
           </div>
+          </>
         ) : status === "loading" || !stats ? (
           status === "error" ? (
             <div className="profile-error">
