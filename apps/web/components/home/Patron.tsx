@@ -736,24 +736,32 @@ async function mountScene(
   };
   placeSouls();
 
-  // Label anchors: candidates per layer, the one nearest the camera is used.
-  const anchors: Record<PartKey, Object3D[]> = {
-    guardians: sentinels.map((s) => s.anchor),
-    walkers: walkers.map((w) => w.head),
-    shrines: shrines.map((s) => s.sphere),
-    cage: [cage.anchor],
-    core: [core.root],
+  // Label anchors: one fixed object per layer, chosen at build time so labels never jump.
+  const pick = <T,>(list: readonly T[], index: number): T => {
+    const item = list[index];
+    if (item === undefined) throw new Error(`Patron: missing scene object at ${index}`);
+    return item;
+  };
+  // Guardian anchor: the sentinel with the largest world z (nearest the hero camera), fixed at build time.
+  root.updateMatrixWorld(true);
+  let frontIndex = 0;
+  let frontZ = -Infinity;
+  sentinels.forEach((s, i) => {
+    s.anchor.getWorldPosition(scratch);
+    if (scratch.z > frontZ + 1e-6) {
+      frontZ = scratch.z;
+      frontIndex = i;
+    }
+  });
+  const anchors: Record<PartKey, Object3D> = {
+    guardians: pick(sentinels, frontIndex).anchor,
+    walkers: pick(walkers, 1).head, // 210 deg
+    shrines: pick(shrines, 0).sphere, // first shrine, x = +2
+    cage: cage.anchor,
+    core: core.root,
   };
   const anchorFor = (key: PartKey, out: Vector3): void => {
-    let bestD = Infinity;
-    for (const obj of anchors[key]) {
-      obj.getWorldPosition(scratch);
-      const d = scratch.distanceToSquared(camera.position);
-      if (d < bestD) {
-        bestD = d;
-        out.copy(scratch);
-      }
-    }
+    anchors[key].getWorldPosition(out);
   };
 
   const stageValues: Record<PartKey, number> = { guardians: 0, walkers: 0, shrines: 0, cage: 0, core: 0 };
@@ -778,6 +786,13 @@ async function mountScene(
   const coreTilt: Spring = { x: 0, v: 0 };
   const glow: Spring = { x: 0, v: 0 };
   let idleYaw = 0;
+  let aimX = 0;
+  let aimY = 0;
+  let yawTarget = 0;
+  let pitchTarget = 0;
+  const labelList = stage.querySelector<HTMLElement>(".reliquary-labels");
+  // True while a label link is hovered or has focus: aim targets are held.
+  const labelHeld = (): boolean => labelList !== null && (labelList.matches(":hover") || labelList.matches(":focus-within"));
   let lastMove = performance.now();
   let baseX = 0;
   let baseY = 0;
@@ -810,7 +825,7 @@ async function mountScene(
       w.torso.position.y = 0.7 * legScale;
       w.torso.rotation.x = WALKER_PITCH * k;
       w.visor.emissiveIntensity = lerp(WALKER_VISOR_LIT, WALKER_VISOR_DARK, k);
-      stepSpring(w.yaw, pointerX * WALKER_HEAD_TURN * (1 - k), HEAD_STIFFNESS, HEAD_DAMPING, dt);
+      stepSpring(w.yaw, aimX * WALKER_HEAD_TURN * (1 - k), HEAD_STIFFNESS, HEAD_DAMPING, dt);
       w.head.rotation.y = w.yaw.x;
     }
   }
@@ -900,11 +915,14 @@ async function mountScene(
       const rawY = (-worldPosition.y * 0.5 + 0.5) * height;
       const x = clamp(rawX, LABEL_EDGE_PX, Math.max(LABEL_EDGE_PX, width - size.w - LABEL_EDGE_PX));
       const minY = LABEL_EDGE_PX;
-      const y = clamp(rawY, minY, Math.max(minY, height - size.h - LABEL_EDGE_PX)) + (1 - s) * LABEL_RISE_PX;
+      // Never hide or disable a label that is hovered or focused, so it cannot flicker out of reach.
+      const keep = item.matches(":hover, :focus-within");
+      const rise = keep ? 0 : (1 - s) * LABEL_RISE_PX;
+      const y = clamp(rawY, minY, Math.max(minY, height - size.h - LABEL_EDGE_PX)) + rise;
       item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      item.style.opacity = s.toFixed(3);
-      item.style.pointerEvents = s > 0.05 ? "auto" : "none";
-      item.style.visibility = s < 0.05 ? "hidden" : "visible";
+      item.style.opacity = (keep ? Math.max(s, 0.6) : s).toFixed(3);
+      item.style.pointerEvents = s > 0.05 || keep ? "auto" : "none";
+      item.style.visibility = s < 0.05 && !keep ? "hidden" : "visible";
     });
   }
 
@@ -915,17 +933,26 @@ async function mountScene(
     lastTime = now;
     elapsed += dt;
 
-    if (!reduced) {
-      if (now - lastMove > IDLE_DELAY_MS) idleYaw += IDLE_YAW_SPEED * dt;
-      else idleYaw *= Math.exp(-dt * IDLE_YAW_DECAY);
-    }
-    stepSpring(yawSpring, pointerX * POINTER_YAW + idleYaw, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
-    stepSpring(pitchSpring, pointerY * POINTER_PITCH, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
-    root.rotation.set(pitchSpring.x, yawSpring.x, 0);
-
     const raw = scrollProgress();
     stepSpring(progressSpring, raw, SCROLL_STIFFNESS, SCROLL_DAMPING, dt);
     const p = clamp(progressSpring.x, 0, 1);
+    // Pointer steering fades out during the lane push so labels stay put.
+    const cursorInfluence = 1 - smoothstep(0.1, 0.25, p);
+
+    // While a label link is hovered or focused, hold the aim targets so nothing moves under the cursor.
+    if (!labelHeld()) {
+      if (!reduced) {
+        if (now - lastMove > IDLE_DELAY_MS && cursorInfluence >= 1) idleYaw += IDLE_YAW_SPEED * dt;
+        else idleYaw *= Math.exp(-dt * IDLE_YAW_DECAY);
+      }
+      aimX = pointerX;
+      aimY = pointerY;
+      yawTarget = aimX * POINTER_YAW * cursorInfluence + (cursorInfluence >= 1 ? idleYaw : 0);
+      pitchTarget = aimY * POINTER_PITCH * cursorInfluence;
+    }
+    stepSpring(yawSpring, yawTarget, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
+    stepSpring(pitchSpring, pitchTarget, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
+    root.rotation.set(pitchSpring.x, yawSpring.x, 0);
     root.position.set(baseX, baseY + (raw <= 0 ? window.scrollY * 0.0012 : 0), 0);
     root.scale.setScalar(baseScale);
 
