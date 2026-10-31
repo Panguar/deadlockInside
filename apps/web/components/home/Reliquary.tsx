@@ -46,6 +46,7 @@ const SCROLL_STIFFNESS = 120;
 const SCROLL_DAMPING = 1;
 const MAX_DT = 1 / 30;
 const LABEL_RISE_PX = 6;
+const LABEL_EDGE_PX = 8;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -340,6 +341,7 @@ async function mountScene(
   const worldPosition = new THREE.Vector3();
   let width = 0;
   let height = 0;
+  const labelSizes: { w: number; h: number }[] = [];
   let rafId = 0;
   let lastTime = 0;
   let visible = false;
@@ -372,8 +374,13 @@ async function mountScene(
       const s = smoothstep(0.35, 0.7, partProgress(p, i));
       groups[part.key].getWorldPosition(worldPosition);
       worldPosition.project(camera);
-      const x = (worldPosition.x * 0.5 + 0.5) * width;
-      const y = (-worldPosition.y * 0.5 + 0.5) * height + (1 - s) * LABEL_RISE_PX;
+      const size = labelSizes[i] ?? { w: 0, h: 0 };
+      const rawX = (worldPosition.x * 0.5 + 0.5) * width;
+      const rawY = (-worldPosition.y * 0.5 + 0.5) * height;
+      const x = clamp(rawX, LABEL_EDGE_PX, Math.max(LABEL_EDGE_PX, width - size.w - LABEL_EDGE_PX));
+      const minY = LABEL_EDGE_PX;
+      const y =
+        clamp(rawY, minY, Math.max(minY, height - size.h - LABEL_EDGE_PX)) + (1 - s) * LABEL_RISE_PX;
       item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       item.style.opacity = s.toFixed(3);
       item.style.pointerEvents = s > 0.05 ? "auto" : "none";
@@ -434,12 +441,22 @@ async function mountScene(
     rafId = requestAnimationFrame(frame);
   }
 
+  function measureLabels(): void {
+    const labels = getLabels();
+    labelSizes.length = 0;
+    getParts().forEach((_, i) => {
+      const item = labels[i];
+      labelSizes[i] = { w: item?.offsetWidth ?? 0, h: item?.offsetHeight ?? 0 };
+    });
+  }
+
   function resize(): void {
     const w = stage.clientWidth;
     const h = stage.clientHeight;
     if (w === 0 || h === 0) return;
     width = w;
     height = h;
+    measureLabels();
     const wide = w >= 960;
     baseX = wide ? 1.35 : 0;
     baseY = wide ? 0 : 0.4;

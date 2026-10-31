@@ -17,14 +17,8 @@
 }
 
 .meta-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-section);
-  line-height: 1.04;
   overflow-wrap: break-word;
   min-width: 0;
-  color: var(--color-ink);
 }
 
 .meta-caption,
@@ -338,14 +332,40 @@ html.js .gauge-svg.is-in .gauge-needle {
   }
 }
 
-/* Phone: gauges stack, KDA and matches columns hidden. */
+/* Phone: gauges in one compact row of three, portrait and KDA/matches columns hidden. */
 @media (max-width: 40rem) {
   .meta-dials {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .meta-dial .gauge-svg {
+    width: 100%;
+  }
+
+  .meta-portrait {
+    display: none;
+  }
+
+  .meta-dial-name {
+    font-size: var(--text-sm);
+  }
+
+  .meta-dial-rate {
+    font-size: var(--text-xl);
   }
 
   .meta-col-extra {
     display: none;
+  }
+}
+
+/* Touch: hero links get a 44px hit area without changing the visual size. */
+@media (pointer: coarse) {
+  .meta-hero-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 }
 

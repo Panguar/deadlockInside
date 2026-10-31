@@ -3,16 +3,9 @@
 }
 
 .profile-title {
-  /* shares heading rules with .workshop-title */
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-section);
-  line-height: 1.04;
-  text-transform: uppercase;
-  color: var(--color-ink);
+  /* typography shared through .reveal-h2 in globals.css */
   overflow-wrap: break-word;
   min-width: 0;
-  margin: 0 0 var(--space-xl);
 }
 
 .profile-lede,

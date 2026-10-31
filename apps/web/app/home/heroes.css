@@ -10,13 +10,6 @@
 }
 
 .heroes-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-section);
-  line-height: 1.04;
-  text-transform: uppercase;
-  color: var(--color-ink);
   overflow-wrap: break-word;
   min-width: 0;
 }
@@ -206,9 +199,6 @@
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-  opacity: 0;
-  transform: translateY(6px) scale(0.98);
-  transition: opacity 120ms var(--ease-in), transform 120ms var(--ease-in);
   pointer-events: none;
 }
 
@@ -224,17 +214,23 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .hero-card:hover .hero-card-tag {
+  html.js .hero-card-tag {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    transition: opacity 120ms var(--ease-in), transform 120ms var(--ease-in);
+  }
+
+  html.js .hero-card:hover .hero-card-tag {
     opacity: 1;
     transform: none;
     transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
   }
-}
 
-.hero-card:focus-visible .hero-card-tag {
-  opacity: 1;
-  transform: none;
-  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  html.js .hero-card:focus-visible .hero-card-tag {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Skeleton */
@@ -296,7 +292,7 @@ html.js .hero-card.is-in::before {
 
 /* Touch devices: win rate stays in the plate, no hover tag */
 
-@media (hover: none) {
+@media not all and (hover: hover) and (pointer: fine) {
   .hero-card-tag {
     display: none;
   }

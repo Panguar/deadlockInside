@@ -12,6 +12,14 @@
   pointer-events: auto;
 }
 
+@media (pointer: coarse) {
+  .home-stage-layer .reliquary-labels a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 .home-hero,
 .home-parts {
   position: relative;
@@ -22,6 +30,7 @@
 .home-hero {
   min-height: calc(100svh - var(--nav-height));
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   padding-block: var(--space-xl);
 }
@@ -33,9 +42,14 @@
 }
 
 .home-hero-copy {
-  grid-column: 1 / span 6;
   min-width: 0;
   pointer-events: auto;
+}
+
+@media (min-width: 60.0625rem) {
+  .home-hero-copy {
+    grid-column: 1 / span 6;
+  }
 }
 
 html.js .home-hero-copy > * {
@@ -103,7 +117,28 @@ html.js .home-hero-copy > :nth-child(3) { animation-delay: 120ms; }
   .home-hero-copy {
     grid-column: 1 / -1;
     background: var(--color-paper);
-    padding: var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .home-wordmark {
+    font-size: clamp(2.5rem, 11vw, 3.5rem);
+  }
+
+  .home-lede {
+    max-width: none;
+  }
+
+  .home-hero-copy .search-field {
+    width: 100%;
+  }
+
+  .home-hero-copy .search-wrap {
+    width: 100%;
+  }
+
+  .home-hero-copy input {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .home-parts {

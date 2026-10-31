@@ -4,15 +4,8 @@
 
 .workshop-title,
 .profile-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-section);
-  line-height: 1.04;
-  text-transform: uppercase;
-  color: var(--color-ink);
   overflow-wrap: break-word;
   min-width: 0;
-  margin: 0 0 var(--space-xl);
 }
 
 .workshop-grid {
@@ -180,6 +173,12 @@
       animation-timeline: view();
       animation-range: entry 0% entry 60%;
     }
+  }
+}
+
+@media (pointer: coarse) {
+  .workshop-news-link {
+    min-height: 44px;
   }
 }
 

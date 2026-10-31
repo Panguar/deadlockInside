@@ -37,7 +37,7 @@ export function MetaSection() {
           <h2 id="meta-title" ref={titleRef} className="meta-title reveal-h2">
             Кто держит патч
           </h2>
-          {ready ? <p className="meta-caption">По <CountUp value={totalMatches} format={formatMatches} /> матчам источника</p> : null}
+          {ready ? <p className="meta-caption">Выборка источника: <CountUp value={totalMatches} format={formatMatches} /></p> : null}
         </header>
 
         {status === "error" ? (
@@ -88,8 +88,8 @@ export function MetaSection() {
                     <div key={index} className="meta-skeleton meta-skeleton-row" />
                   ))}
                 </div>
-              ) : ready && tableHeroes.length === 0 ? (
-                <p className="meta-empty">Данных по героям пока нет.</p>
+              ) : ready && heroes.length === 0 ? (
+                <p className="meta-empty">Нет данных по героям для этого патча.</p>
               ) : (
                 <table className="meta-table">
                   <thead>

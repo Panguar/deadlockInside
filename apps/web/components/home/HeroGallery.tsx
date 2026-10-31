@@ -91,7 +91,14 @@ export function HeroGallery() {
           </div>
         )}
 
-        {status === "ready" && (
+        {status === "ready" && heroes.length === 0 && (
+          <div className="heroes-state" role="status">
+            <span>Источник пока не вернул ни одного героя.</span>
+            <button type="button" className="heroes-retry" onClick={retry}>Повторить</button>
+          </div>
+        )}
+
+        {status === "ready" && heroes.length > 0 && (
           <div className="hero-grid" ref={gridRef}>
             {sorted.map((hero, index) => {
               const name = hero.name ?? `Герой ${hero.hero_id}`;
