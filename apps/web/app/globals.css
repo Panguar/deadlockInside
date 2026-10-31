@@ -1,6 +1,6 @@
-/* Hallmark · shape: custom vitrines · genre: atmospheric · theme: custom · idea: "a brass reliquary from 1930s New York that comes apart on scroll, each part a vitrine of match data" · vibe: "art deco occult noir, brass and patina"
+/* Hallmark · shape: custom vitrines · genre: atmospheric · theme: custom · idea: "the Patron's sanctum from a Deadlock lane, its defences falling in match order as you scroll, each fallen layer a vitrine of match data" · vibe: "art deco occult noir, brass and patina"
  * paper: oklch(15.9% 0.006 85) · accent: oklch(73.1% 0.115 85) · display: Advent Pro · body: Onest · outlier: Poiret One (wordmark)
- * nav: site header, wordmark left, links, account action · footer: engraved brass plaque · hero: custom, wordmark head with search left, 3D reliquary right · signature: the reliquary taken apart into section links · job: search a player
+ * nav: site header, wordmark left, links, account action · footer: engraved brass plaque · hero: custom, wordmark head with search left, 3D reliquary right · signature: the lane push, guardians to Patron, each layer a section link · job: search a player
  * axes: dark/display-condensed/chromatic-amber · posture: full palette (field charcoal and brown, signal brass, seal patina, warm oxblood) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: P, every ornament is made a working gauge so data leads the decoration */
 /* Hallmark · waive 12 · the gauge needle alone uses --ease-needle · a brass instrument needle settles past its mark like the real dial it imitates */
@@ -278,6 +278,7 @@ main { flex: 1; min-width: 0; }
   transition: color .15s ease;
 }
 .sign-in-link:hover { color: var(--brass); text-decoration: underline; }
+.sign-in-short { display: none; }
 
 /* ---- home / hero / search ---- */
 
@@ -991,6 +992,9 @@ main { flex: 1; min-width: 0; }
   .site-header { width: calc(100% - 32px); height: 63px; gap: 10px; }
   .brand { gap: 9px; font-size: 13px; flex-shrink: 0; }
   .brand img { width: 104px; max-height: 34px; }
+  .brand-wordmark { font-size: var(--text-lg); }
+  .sign-in-full { display: none; }
+  .sign-in-short { display: inline; }
   .brand-mark { width: 24px; height: 24px; }
   .main-nav { gap: var(--space-sm); min-width: 0; font-size: 13px; letter-spacing: 0; }
   .sign-in-link { white-space: nowrap; padding: 7px 9px; font-size: 13px; letter-spacing: 0; }
