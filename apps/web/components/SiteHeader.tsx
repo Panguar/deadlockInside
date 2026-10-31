@@ -23,13 +23,13 @@ export function SiteHeader() {
 
   return (
     <header className="site-header">
-      <Link className="brand" href="/" aria-label="Deadlock Inside — главная">
-        <img src="/deadlock-insight.png" alt="Deadlock Insight" />
+      <Link className="brand" href="/" aria-label="Deadlock Insight, главная">
+        <span className="brand-wordmark">Deadlock Insight</span>
       </Link>
       <nav className="main-nav" aria-label="Основная навигация">
         <Link href="/heroes">Герои</Link>
         <a href="https://deadlock-api.com/" target="_blank" rel="noreferrer">
-          Источник данных <span aria-hidden="true">↗</span>
+          Источник данных
         </a>
         {account ? (
           <details className="account-menu">

@@ -1,0 +1,41 @@
+:root {
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem; --text-xl: 1.5625rem; --text-2xl: 1.953rem; --text-3xl: 2.441rem;
+  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem); --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem); --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem); --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --color-error: oklch(52% 0.19 27); --color-success: oklch(50% 0.12 150);
+  --container: 1440px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+  --color-paper: oklch(15.9% 0.006 85);      /* charcoal #0E0D0B, page ground */
+  --color-paper-2: oklch(21.2% 0.012 67);    /* warm brown #1C1814, wells */
+  --color-paper-3: oklch(26% 0.016 70);      /* raised brown, cards */
+  --color-ink: oklch(91.8% 0.032 87);        /* cream paper #EDE3CC, main text */
+  --color-ink-2: oklch(82% 0.03 85);         /* secondary text on dark */
+  --color-muted: oklch(70% 0.025 80);        /* captions on charcoal/brown only */
+  --color-rule: oklch(34% 0.03 78);          /* hairlines */
+  --color-rule-strong: oklch(50% 0.07 82);   /* engraved brass lines */
+  --color-accent: oklch(73.1% 0.115 85);     /* brass #C9A24A, key actions */
+  --color-accent-hi: oklch(80% 0.11 87);     /* brass hover step */
+  --color-accent-ink: oklch(15.9% 0.006 85); /* text on brass */
+  --color-focus: oklch(82% 0.16 88);
+  --color-patina: oklch(58.7% 0.08 180);     /* #3E8C7E fills, positive */
+  --color-patina-text: oklch(72% 0.09 180);  /* patina as small text on dark */
+  --color-patina-ink: oklch(15.9% 0.006 85);
+  --color-oxblood: oklch(47.3% 0.161 24);    /* #A3262A fills, hot/down */
+  --color-oxblood-text: oklch(66% 0.17 26);  /* oxblood as small text on dark */
+  --color-oxblood-ink: oklch(91.8% 0.032 87);
+  --color-cream-card: oklch(91.8% 0.032 87); /* paper tags, tooltips, light cards */
+  --color-cream-card-ink: oklch(15.9% 0.006 85);
+  --color-team-amber: oklch(74% 0.15 68);    /* match data only */
+  --color-team-sapphire: oklch(68% 0.12 255);/* match data only */
+  --color-error: var(--color-oxblood-text); --color-success: var(--color-patina-text);
+  --font-display: "Advent Pro", "Arial Narrow", sans-serif;
+  --font-body: "Onest", ui-sans-serif, system-ui, sans-serif;
+  --font-outlier: "Poiret One", "Advent Pro", sans-serif;   /* wordmark only */
+  --radius-card: 2px; --shadow-card: none; --tracking-display: 0;
+  --text-hero: clamp(3.5rem, 7vw + 1rem, 7.5rem);
+  --nav-height: 64px;
+  --rule-hair: 1px; --radius-pill: 999px;
+}
