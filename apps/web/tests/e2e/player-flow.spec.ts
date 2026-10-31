@@ -220,8 +220,8 @@ test("keyboard search disambiguates same-name players and opens a match", async 
   await page.route("https://assets-bucket.deadlock-api.com/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWioAAAAASUVORK5CYII=", "base64") }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-  await expect(page.locator(".brand img")).toHaveAttribute("src", "/deadlock-insight.png");
-  await page.getByRole("heading", { name: /Каждый матч/ }).waitFor();
+  await expect(page.locator(".brand .brand-wordmark")).toHaveText("Deadlock Insight");
+  await page.locator("#home-title").waitFor();
   const screenshotDir = resolve(process.cwd(), "../../.superpowers/screenshots");
   await mkdir(screenshotDir, { recursive: true });
   await page.screenshot({ path: resolve(screenshotDir, "desktop-home.png"), fullPage: true });
