@@ -59,7 +59,7 @@ html.js .home-hero-copy > :nth-child(3) { animation-delay: 120ms; }
 
 .home-wordmark {
   font-family: var(--font-outlier);
-  font-size: clamp(3rem, 4.6vw + 0.5rem, 6.25rem);
+  font-size: clamp(2.75rem, 3.4vw + 0.75rem, 5.5rem);
   line-height: 1.02;
   font-weight: 400;
   color: var(--color-ink);

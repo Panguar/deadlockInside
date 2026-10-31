@@ -10,11 +10,20 @@ function readNavHeight(): number {
   return Number.isFinite(parsed) ? parsed : 64;
 }
 
+const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
+
 export function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    // Native touch scrolling and keyboard scrolling stay native (Lenis does not hook keys).
+    const lenis = new Lenis({
+      lerp: 0.085,
+      smoothWheel: true,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1,
+      syncTouch: false,
+    });
     let frame = 0;
 
     const loop = (time: number) => {
@@ -40,7 +49,11 @@ export function SmoothScroll() {
       const element = document.getElementById(id);
       if (!element) return;
       event.preventDefault();
-      lenis.scrollTo(element, { offset: -readNavHeight() });
+      lenis.scrollTo(element, {
+        offset: -readNavHeight(),
+        duration: 1.1,
+        easing: easeOutQuart,
+      });
       window.history.replaceState(null, "", `#${id}`);
     };
 

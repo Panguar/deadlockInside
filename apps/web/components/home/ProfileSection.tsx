@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from "@/components/AccountProvider";
 import { Gauge } from "@/components/home/Gauge";
 import { useHeroStats } from "@/components/home/useHeroStats";
+import { useReveal } from "@/components/home/reveal";
 import { apiRequest, type PlayerStats } from "@/lib/api";
 import { getHeroPortrait } from "@/lib/hero-portraits";
 import "@/app/home/profile.css";
@@ -19,6 +20,7 @@ export function ProfileSection() {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   useEffect(() => {
     if (!accountId) return;
@@ -41,7 +43,7 @@ export function ProfileSection() {
   return (
     <section id="profile" className="profile" aria-labelledby="profile-title">
       <div className="container">
-        <h2 id="profile-title" className="profile-title">
+        <h2 id="profile-title" ref={titleRef} className="profile-title reveal-h2">
           Ваш профиль
         </h2>
 

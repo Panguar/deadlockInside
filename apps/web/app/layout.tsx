@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AccountProvider } from "@/components/AccountProvider";
@@ -21,7 +22,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <AccountProvider>
           <div className="site-shell">
             <SiteHeader />
-            <main>{children}</main>
+            <main>
+              <ViewTransition default="page">{children}</ViewTransition>
+            </main>
             <footer className="site-plaque">
               <div className="plaque-plate">
                 <p className="plaque-wordmark">Deadlock Insight</p>

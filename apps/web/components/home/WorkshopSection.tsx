@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { apiRequest, formatDate } from "@/lib/api";
+import { CountUp } from "./CountUp";
+import { useReveal } from "./reveal";
 import "@/app/home/workshop.css";
 
 type Online = { player_count: number };
@@ -22,6 +24,7 @@ export function WorkshopSection() {
   const [news, setNews] = useState<News[]>([]);
   const [newsState, setNewsState] = useState<"loading" | "ready" | "error">("loading");
   const [newsAttempt, setNewsAttempt] = useState(0);
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   useEffect(() => {
     let alive = true;
@@ -60,7 +63,7 @@ export function WorkshopSection() {
   return (
     <section id="workshop" className="workshop" aria-labelledby="workshop-title">
       <div className="container">
-        <h2 id="workshop-title" className="workshop-title">
+        <h2 id="workshop-title" ref={titleRef} className="workshop-title reveal-h2">
           Билды, живые матчи, лидерборд
         </h2>
         <div className="workshop-grid">
@@ -79,7 +82,7 @@ export function WorkshopSection() {
             {onlineState === "ready" && online !== null ? (
               <p className="workshop-online">
                 <span className="workshop-online-value">
-                  {new Intl.NumberFormat("ru-RU").format(online)}
+                  <CountUp value={online} format={(n) => new Intl.NumberFormat("ru-RU").format(Math.round(n))} />
                 </span>
                 <span className="workshop-online-caption">игроков онлайн по данным Steam</span>
               </p>

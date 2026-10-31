@@ -1,4 +1,7 @@
+"use client";
+
 import type { CSSProperties, ReactNode } from "react";
+import { useReveal } from "./reveal";
 
 export type GaugeProps = {
   value: number;
@@ -34,6 +37,7 @@ export function Gauge({
   reference,
   size = 220,
 }: GaugeProps) {
+  const revealRef = useReveal<SVGSVGElement>();
   const span = max - min;
   const toFraction = (input: number) => Math.min(1, Math.max(0, (input - min) / span));
 
@@ -45,10 +49,14 @@ export function Gauge({
     const fraction = toFraction(tickValue);
     const outer = point(fraction, RADIUS);
     const inner = point(fraction, RADIUS - (major ? 9 : 4));
+    // Ticks engrave in groups of one major step, 20ms apart (capped).
+    const group = Math.min(Math.floor((tickValue - min) / majorEvery), 10);
     ticks.push(
       <line
         key={`tick-${i}`}
         className={major ? "gauge-tick gauge-tick-major" : "gauge-tick"}
+        pathLength={1}
+        style={{ "--k": group } as CSSProperties}
         x1={outer.x}
         y1={outer.y}
         x2={inner.x}
@@ -87,6 +95,7 @@ export function Gauge({
 
   return (
     <svg
+      ref={revealRef}
       className="gauge-svg"
       viewBox={`0 0 200 ${VIEW_HEIGHT}`}
       width={size}
@@ -97,6 +106,7 @@ export function Gauge({
     >
       <path
         className="gauge-arc"
+        pathLength={1}
         d={`M ${arcStart.x} ${arcStart.y} A ${RADIUS} ${RADIUS} 0 0 1 ${arcEnd.x} ${arcEnd.y}`}
       />
       {ticks}

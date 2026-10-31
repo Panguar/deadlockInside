@@ -7,6 +7,8 @@ import { getHeroPortrait } from "@/lib/hero-portraits";
 import "@/app/home/meta.css";
 import { Gauge } from "./Gauge";
 import { useHeroStats } from "./useHeroStats";
+import { CountUp } from "./CountUp";
+import { useReveal } from "./reveal";
 
 const RATE_UP = 0.52;
 const RATE_DOWN = 0.48;
@@ -21,6 +23,7 @@ function rateTone(winRate: number) {
 export function MetaSection() {
   const { status, heroes, totalMatches, avgWinRate, retry } = useHeroStats();
   const ready = status === "ready";
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   const sumMatches = heroes.reduce((sum, hero) => sum + hero.matches, 0);
   const byWinRate = [...heroes].sort((a, b) => b.win_rate - a.win_rate);
@@ -31,10 +34,10 @@ export function MetaSection() {
     <section id="meta" className="meta" aria-labelledby="meta-title">
       <div className="container meta-inner">
         <header className="meta-head">
-          <h2 id="meta-title" className="meta-title">
+          <h2 id="meta-title" ref={titleRef} className="meta-title reveal-h2">
             Кто держит патч
           </h2>
-          {ready ? <p className="meta-caption">По {formatMatches(totalMatches)} матчам источника</p> : null}
+          {ready ? <p className="meta-caption">По <CountUp value={totalMatches} format={formatMatches} /> матчам источника</p> : null}
         </header>
 
         {status === "error" ? (
@@ -71,7 +74,7 @@ export function MetaSection() {
                         />
                         <span className="meta-dial-text">
                           <span className="meta-dial-name">{hero.name}</span>
-                          <span className={`meta-dial-rate ${rateTone(hero.win_rate)}`}>{formatPercent(hero.win_rate)}</span>
+                          <span className={`meta-dial-rate ${rateTone(hero.win_rate)}`}><CountUp value={hero.win_rate} format={formatPercent} /></span>
                         </span>
                       </figcaption>
                     </figure>

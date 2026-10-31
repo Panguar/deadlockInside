@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Color, Group, Material, Mesh, Object3D, Shape, WebGLRenderer } from "three";
+import type { Color, Group, Material, Mesh, Object3D, Shape, Sphere, WebGLRenderer } from "three";
 import "@/app/home/reliquary.css";
 
 type ThreeLib = typeof import("three");
@@ -14,19 +14,38 @@ type Materials = { brass: Material; patina: Material; bronze: Material };
 
 type ExtendedNavigator = Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
 
+type Spring = { x: number; v: number };
+
 const PART_ORDER: readonly PartKey[] = ["crown", "rays", "gears", "dial", "plinth"];
 const PART_BASE_Y: Record<PartKey, number> = { crown: 1.7, rays: 0.85, gears: 0, dial: -0.85, plinth: -1.7 };
-const PART_DIRECTION: Record<PartKey, [number, number, number]> = {
-  crown: [0.6, 1, 0.2],
-  rays: [-1, 0, 0],
-  gears: [1, 0, 0],
-  dial: [-0.6, 0, 0.8],
-  plinth: [0, -1, 0],
+// Explode offsets in world units, relative to each part's assembled position, at full progress.
+const PART_EXPLODE: Record<PartKey, [number, number, number]> = {
+  crown: [-1.5, 1.3, 0],
+  rays: [0, 0.2, 0.3],
+  gears: [1.8, 0.3, 0],
+  dial: [-1.7, -0.9, 0.4],
+  plinth: [1.4, -1.5, 0],
 };
-const EXPLODE_DISTANCE = 1.2;
+const PART_STAGGER = 0.07;
+const PART_SPAN = 0.55;
+const CAMERA_RADIUS = 10;
+const CAMERA_RADIUS_GROWTH = 2.4;
+const CAMERA_AZIMUTH = 0.22;
+const CAMERA_FIT_LIMIT = 0.92;
+const CAMERA_FIT_STEP = 0.3;
+const CAMERA_FIT_MAX_STEPS = 6;
+const RING_COUNTER_SPIN = 0.8;
+const CAMERA_LOOK_Y = 0.2;
 const TAU = Math.PI * 2;
-const IDLE_DELAY_MS = 2000;
+const IDLE_DELAY_MS = 2500;
 const IDLE_YAW_SPEED = 0.05;
+const IDLE_YAW_DECAY = 2;
+const CURSOR_STIFFNESS = 70;
+const CURSOR_DAMPING = 0.85;
+const SCROLL_STIFFNESS = 120;
+const SCROLL_DAMPING = 1;
+const MAX_DT = 1 / 30;
+const LABEL_RISE_PX = 6;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -37,9 +56,21 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-function easeOutCubic(t: number): number {
-  const u = 1 - t;
-  return 1 - u * u * u;
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+// Second-order spring step: weighted, with momentum, no visible overshoot at the damping used here.
+function stepSpring(s: Spring, target: number, stiffness: number, damping: number, dt: number): void {
+  const c = 2 * damping * Math.sqrt(stiffness);
+  s.v += (target - s.x) * stiffness * dt;
+  s.v -= s.v * c * dt;
+  s.x += s.v * dt;
+}
+
+// Each part has its own slice of the scroll track.
+function partProgress(p: number, index: number): number {
+  return easeInOutCubic(clamp((p - index * PART_STAGGER) / PART_SPAN, 0, 1));
 }
 
 function shouldUseStill(): boolean {
@@ -263,7 +294,7 @@ async function mountScene(
   scene.add(keyLight, fillLight, rimLight);
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  camera.position.set(0, 0.6, 10);
+  camera.position.set(0, 0.6, CAMERA_RADIUS);
 
   const root = new THREE.Group();
   scene.add(root);
@@ -276,6 +307,36 @@ async function mountScene(
   };
   for (const key of PART_ORDER) root.add(groups[key]);
 
+  // Bounding spheres in each group's local space (groups sit at identity here).
+  const bounds = {} as Record<PartKey, Sphere>;
+  for (const key of PART_ORDER) {
+    bounds[key] = new THREE.Box3().setFromObject(groups[key]).getBoundingSphere(new THREE.Sphere());
+  }
+
+  // True when every part's sphere centre and centre +- radius (camera right/up) projects inside the frame.
+  const fitsViewport = (): boolean => {
+    const scale = root.scale.x;
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+    for (const key of PART_ORDER) {
+      const sphere = bounds[key];
+      const r = sphere.radius * scale;
+      const centre = sphere.center.clone().applyMatrix4(groups[key].matrixWorld);
+      const probes = [
+        centre,
+        centre.clone().addScaledVector(right, r),
+        centre.clone().addScaledVector(right, -r),
+        centre.clone().addScaledVector(up, r),
+        centre.clone().addScaledVector(up, -r),
+      ];
+      for (const probe of probes) {
+        probe.project(camera);
+        if (Math.abs(probe.x) > CAMERA_FIT_LIMIT || Math.abs(probe.y) > CAMERA_FIT_LIMIT) return false;
+      }
+    }
+    return true;
+  };
+
   const worldPosition = new THREE.Vector3();
   let width = 0;
   let height = 0;
@@ -285,8 +346,9 @@ async function mountScene(
   let disposed = false;
   let pointerX = 0;
   let pointerY = 0;
-  let rotYaw = 0;
-  let rotPitch = 0;
+  const yawSpring: Spring = { x: 0, v: 0 };
+  const pitchSpring: Spring = { x: 0, v: 0 };
+  const progressSpring: Spring = { x: 0, v: 0 };
   let idleYaw = 0;
   let lastMove = performance.now();
   let baseX = 0;
@@ -304,48 +366,67 @@ async function mountScene(
 
   function updateLabels(p: number): void {
     const labels = getLabels();
-    const opacity = smoothstep(0.2, 0.4, p);
     getParts().forEach((part, i) => {
       const item = labels[i];
       if (!item) return;
+      const s = smoothstep(0.35, 0.7, partProgress(p, i));
       groups[part.key].getWorldPosition(worldPosition);
       worldPosition.project(camera);
       const x = (worldPosition.x * 0.5 + 0.5) * width;
-      const y = (-worldPosition.y * 0.5 + 0.5) * height;
+      const y = (-worldPosition.y * 0.5 + 0.5) * height + (1 - s) * LABEL_RISE_PX;
       item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      item.style.opacity = opacity.toFixed(3);
-      item.style.pointerEvents = opacity > 0.05 ? "auto" : "none";
-      item.style.visibility = opacity < 0.05 ? "hidden" : "visible";
+      item.style.opacity = s.toFixed(3);
+      item.style.pointerEvents = s > 0.05 ? "auto" : "none";
+      item.style.visibility = s < 0.05 ? "hidden" : "visible";
     });
   }
 
   function frame(now: number): void {
     rafId = 0;
     if (!shouldRun()) return;
-    const dt = Math.min((now - lastTime) / 1000, 0.1);
+    const dt = Math.min((now - lastTime) / 1000, MAX_DT);
     lastTime = now;
-    const damping = 1 - Math.exp(-dt * 6);
 
+    // Idle yaw never snaps: it decays while the pointer is active and only grows after idle.
     if (now - lastMove > IDLE_DELAY_MS) idleYaw += IDLE_YAW_SPEED * dt;
-    rotYaw += (pointerX * 0.35 + idleYaw - rotYaw) * damping;
-    rotPitch += (pointerY * 0.12 - rotPitch) * damping;
-    root.rotation.set(rotPitch, rotYaw, 0);
+    else idleYaw *= Math.exp(-dt * IDLE_YAW_DECAY);
 
-    const p = scrollProgress();
-    root.position.set(baseX, baseY + (p <= 0 ? window.scrollY * 0.0015 : 0), 0);
+    stepSpring(yawSpring, pointerX * 0.35 + idleYaw, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
+    stepSpring(pitchSpring, pointerY * 0.12, CURSOR_STIFFNESS, CURSOR_DAMPING, dt);
+    root.rotation.set(pitchSpring.x, yawSpring.x, 0);
+
+    const raw = scrollProgress();
+    stepSpring(progressSpring, raw, SCROLL_STIFFNESS, SCROLL_DAMPING, dt);
+    const p = clamp(progressSpring.x, 0, 1);
+
+    root.position.set(baseX, baseY + (raw <= 0 ? window.scrollY * 0.0012 : 0), 0);
     root.scale.setScalar(baseScale);
 
     PART_ORDER.forEach((key, i) => {
-      const eased = easeOutCubic(clamp((p - i * 0.06) / 0.6, 0, 1));
-      const [dx, dy, dz] = PART_DIRECTION[key];
-      const scale = (EXPLODE_DISTANCE * eased) / Math.hypot(dx, dy, dz);
-      groups[key].position.set(dx * scale, PART_BASE_Y[key] + dy * scale, dz * scale);
+      const local = partProgress(p, i);
+      const [dx, dy, dz] = PART_EXPLODE[key];
+      groups[key].position.set(dx * local, PART_BASE_Y[key] + dy * local, dz * local);
     });
 
-    const azimuth = 0.55 * p;
-    const radius = 10 - 1.2 * p;
-    camera.position.set(Math.sin(azimuth) * radius, 0.6, Math.cos(azimuth) * radius);
-    camera.lookAt(0, 0, 0);
+    const eased = easeInOutCubic(p);
+    const azimuth = CAMERA_AZIMUTH * eased;
+    // Ring and dial counter the camera orbit so their faces keep pointing at the viewer.
+    groups.rays.rotation.y = -azimuth * RING_COUNTER_SPIN;
+    groups.dial.rotation.y = -azimuth * RING_COUNTER_SPIN;
+    root.updateMatrixWorld(true);
+
+    let radius = CAMERA_RADIUS + CAMERA_RADIUS_GROWTH * eased;
+    const aimCamera = (): void => {
+      camera.position.set(Math.sin(azimuth) * radius, 0.6, Math.cos(azimuth) * radius);
+      camera.lookAt(0, CAMERA_LOOK_Y * eased, 0);
+      camera.updateMatrixWorld();
+    };
+    aimCamera();
+    // Pull back until every part stays inside the viewport (bounded retries).
+    for (let step = 0; step < CAMERA_FIT_MAX_STEPS && !fitsViewport(); step++) {
+      radius += CAMERA_FIT_STEP;
+      aimCamera();
+    }
 
     renderer.render(scene, camera);
     updateLabels(p);
@@ -372,7 +453,6 @@ async function mountScene(
     pointerX = (event.clientX / window.innerWidth) * 2 - 1;
     pointerY = -((event.clientY / window.innerHeight) * 2 - 1);
     lastMove = performance.now();
-    idleYaw = 0;
   }
 
   const resizeObserver = new ResizeObserver(resize);

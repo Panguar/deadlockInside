@@ -3,6 +3,7 @@
  * nav: site header, wordmark left, links, account action · footer: engraved brass plaque · hero: custom, wordmark head with search left, 3D reliquary right · signature: the reliquary taken apart into section links · job: search a player
  * axes: dark/display-condensed/chromatic-amber · posture: full palette (field charcoal and brown, signal brass, seal patina, warm oxblood) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: P, every ornament is made a working gauge so data leads the decoration */
+/* Hallmark · waive 12 · the gauge needle alone uses --ease-needle · a brass instrument needle settles past its mark like the real dial it imitates */
 @import url("./hallmark/tokens.css");
 @import url("./hallmark/base.css");
 
@@ -144,7 +145,7 @@ h1 em, h2 em, h3 em { color: var(--brass-bright); font-style: normal; }
   font-size: 13px;
   letter-spacing: 0;
 }
-.main-nav a { transition: color .15s ease; }
+.main-nav a { transition: color var(--dur-micro) var(--ease-out); }
 .main-nav a:hover, .main-nav a:focus-visible { color: var(--brass-bright); }
 .main-nav a span { color: var(--muted); margin-left: 3px; }
 
@@ -223,9 +224,19 @@ main { flex: 1; min-width: 0; }
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out),
+    transform var(--dur-release) var(--ease-out);
 }
 .button:disabled { cursor: wait; opacity: .65; }
+/* lever press: the control dips under the thumb */
+.button:active:not(:disabled) {
+  transform: translateY(2px) scale(0.985);
+  box-shadow: inset 0 2px 0 var(--color-rule-strong);
+  transition-duration: var(--dur-press);
+}
 .button-primary { background: var(--brass); color: var(--color-accent-ink); }
 .button-primary:hover:not(:disabled) { background: var(--brass-bright); }
 .button-secondary { background: transparent; border-color: var(--brass); color: var(--brass-bright); }
@@ -1102,6 +1113,52 @@ main { flex: 1; min-width: 0; }
   *, *::before, *::after { transition-duration: 0s !important; }
 }
 
+/* ---- page transitions (React ViewTransition, default="page", see layout.tsx) ---- */
+::view-transition-old(.page) { animation: page-out 140ms var(--ease-out) both; }
+::view-transition-new(.page) { animation: page-in 260ms var(--ease-out) 40ms both; }
+@keyframes page-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.page),
+  ::view-transition-new(.page) { animation: none; }
+}
+
+/* ---- art deco frame draw-in: clip-path, not fades ---- */
+@keyframes frame-draw {
+  from { clip-path: inset(0 100% 100% 0); }
+  to { clip-path: inset(0); }
+}
+
+/* ---- section headings: one shared reveal (html.js only; useReveal adds is-in) ---- */
+html.js .reveal-h2:not(.is-in) {
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(0.15em);
+}
+html.js .reveal-h2 {
+  transition: clip-path 360ms var(--ease-out), transform 360ms var(--ease-out);
+}
+html.js .reveal-h2.is-in {
+  clip-path: none;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal-h2,
+  html.js .reveal-h2:not(.is-in) {
+    clip-path: none;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---- counters: stable width while rolling ---- */
+.count-up { font-variant-numeric: tabular-nums; }
+
 /* ---- engraved brass plaque (footer, every page) ---- */
 .site-plaque {
   position: relative;
@@ -1171,6 +1228,15 @@ main { flex: 1; min-width: 0; }
   font-family: var(--font-body);
   font-size: var(--text-xs);
   letter-spacing: 0;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .plaque-plate::before {
+      animation: frame-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
 }
 @media (max-width: 600px) {
   .plaque-plate { padding: var(--space-md) var(--space-lg); }

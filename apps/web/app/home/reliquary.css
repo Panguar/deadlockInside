@@ -17,7 +17,7 @@
 
 .reliquary-still {
   object-fit: contain;
-  transition: opacity 220ms var(--ease-out);
+  transition: opacity 300ms var(--ease-out);
 }
 
 .reliquary-stage[data-live="true"] .reliquary-still {
@@ -65,7 +65,7 @@
   transition:
     background-color 150ms var(--ease-out),
     color 150ms var(--ease-out),
-    transform 150ms var(--ease-out);
+    transform 160ms var(--ease-out);
 }
 
 .reliquary-labels a::before {
@@ -88,8 +88,14 @@
   outline-offset: 2px;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .reliquary-labels a:hover {
+    transform: translateY(-2px);
+  }
+}
+
 .reliquary-labels a:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 
 html:not(.js) .reliquary-labels,

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { useHeroStats } from "@/components/home/useHeroStats";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { getHeroPortrait } from "@/lib/hero-portraits";
+import { useReveal } from "./reveal";
 import "@/app/home/heroes.css";
 
 const SIZE_PATTERN = ["size-tall", "size-s", "size-s", "size-wide", "size-s", "size-tall", "size-s", "size-s"] as const;
@@ -32,6 +33,7 @@ function formatDecimal(value: number | null | undefined) {
 export function HeroGallery() {
   const { status, heroes, totalMatches, retry } = useHeroStats();
   const gridRef = useRef<HTMLDivElement>(null);
+  const titleRef = useReveal<HTMLHeadingElement>();
   const sorted = useMemo(() => [...heroes].sort((a, b) => (b.win_rate ?? -1) - (a.win_rate ?? -1)), [heroes]);
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export function HeroGallery() {
     <section id="heroes" className="heroes" aria-labelledby="heroes-title">
       <div className="container">
         <header className="heroes-head">
-          <h2 id="heroes-title" className="heroes-title">Все герои по винрейту</h2>
+          <h2 id="heroes-title" ref={titleRef} className="heroes-title reveal-h2">Все герои по винрейту</h2>
           {caption && <p className="heroes-caption">{caption}</p>}
         </header>
 

@@ -148,6 +148,35 @@
   stroke-width: 1.5;
 }
 
+/* Gauge on first view (html.js only; useReveal adds is-in to the svg).
+   Arc and major ticks engrave via stroke-dashoffset, the needle sweeps from min after 120ms. */
+html.js .gauge-svg:not(.is-in) .gauge-arc,
+html.js .gauge-svg:not(.is-in) .gauge-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+html.js .gauge-svg.is-in .gauge-arc {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 360ms var(--ease-out);
+}
+
+html.js .gauge-svg.is-in .gauge-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 240ms var(--ease-out) calc(var(--k, 0) * 20ms);
+}
+
+html.js .gauge-svg:not(.is-in) .gauge-needle {
+  transform: rotate(-90deg);
+  transition: none;
+}
+
+html.js .gauge-svg.is-in .gauge-needle {
+  transition: transform 400ms var(--ease-needle) 120ms;
+}
+
 .meta-portrait {
   display: flex;
   align-items: center;
@@ -240,6 +269,8 @@
 
 .meta-retry:active {
   background: var(--color-paper-2);
+  transform: translateY(2px) scale(0.985);
+  transition-duration: var(--dur-press);
 }
 
 .meta-error {
@@ -324,6 +355,15 @@
   }
 
   .gauge-needle {
+    transition: none;
+  }
+
+  html.js .gauge-svg .gauge-needle,
+  html.js .gauge-svg.is-in .gauge-needle,
+  html.js .gauge-svg .gauge-arc,
+  html.js .gauge-svg.is-in .gauge-arc,
+  html.js .gauge-svg .gauge-tick,
+  html.js .gauge-svg.is-in .gauge-tick {
     transition: none;
   }
 }

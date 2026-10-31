@@ -31,6 +31,7 @@
 }
 
 .workshop-vitrine {
+  position: relative;
   background: var(--color-paper-2);
   padding: var(--space-xl);
   border: 0;
@@ -160,7 +161,26 @@
 }
 
 .workshop-retry:active {
-  transform: translateY(1px);
+  transform: translateY(2px) scale(0.985);
+}
+
+/* Inner frame of each well draws in as a line on scroll (html.js only; reduced motion shows the frame) */
+.workshop-vitrine::before {
+  content: "";
+  position: absolute;
+  inset: var(--space-xs);
+  border: 1px solid var(--color-rule-strong);
+  pointer-events: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .workshop-vitrine::before {
+      animation: frame-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
 }
 
 @media (max-width: 899px) {

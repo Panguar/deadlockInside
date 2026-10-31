@@ -69,11 +69,12 @@
   background: var(--color-paper-3);
   color: var(--color-ink);
   text-decoration: none;
-  transition: transform 150ms var(--ease-out);
+  transition: transform var(--dur-release) var(--ease-out);
 }
 
 .hero-card:active {
-  transform: scale(0.99);
+  transform: scale(0.985);
+  transition-duration: var(--dur-press);
 }
 
 .hero-card:focus-visible {
@@ -111,7 +112,7 @@
   border: 1px solid var(--color-rule-strong);
   pointer-events: none;
   z-index: 2;
-  transition: border-color 150ms linear 0ms;
+  transition: border-color 150ms var(--ease-out);
 }
 
 .hero-card::after {
@@ -145,7 +146,12 @@
   );
 }
 
-.hero-card:hover::before,
+@media (hover: hover) and (pointer: fine) {
+  .hero-card:hover::before {
+    border-color: var(--color-accent);
+  }
+}
+
 .hero-card:focus-visible::before {
   border-color: var(--color-accent);
 }
@@ -201,8 +207,8 @@
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  transform: translateY(6px) scale(0.98);
+  transition: opacity 120ms var(--ease-in), transform 120ms var(--ease-in);
   pointer-events: none;
 }
 
@@ -217,10 +223,18 @@
   margin: 0;
 }
 
-.hero-card:hover .hero-card-tag,
+@media (hover: hover) and (pointer: fine) {
+  .hero-card:hover .hero-card-tag {
+    opacity: 1;
+    transform: none;
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  }
+}
+
 .hero-card:focus-visible .hero-card-tag {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
 }
 
 /* Skeleton */
@@ -271,16 +285,13 @@
 /* Draw-in on first view (JS only) */
 
 html.js .hero-card::before {
-  transform: scale(0.96);
-  opacity: 0;
-  transition: transform 320ms var(--ease-out) calc(var(--i, 0) * 40ms),
-    opacity 320ms var(--ease-out) calc(var(--i, 0) * 40ms),
-    border-color 150ms linear 0ms;
+  clip-path: inset(0 100% 100% 0);
+  transition: clip-path 380ms var(--ease-out) calc(var(--i, 0) * 35ms),
+    border-color 150ms var(--ease-out);
 }
 
 html.js .hero-card.is-in::before {
-  transform: scale(1);
-  opacity: 1;
+  clip-path: inset(0);
 }
 
 /* Touch devices: win rate stays in the plate, no hover tag */
@@ -345,7 +356,6 @@ html.js .hero-card.is-in::before {
   }
 
   html.js .hero-card::before {
-    transform: none;
-    opacity: 1;
+    clip-path: none;
   }
 }
