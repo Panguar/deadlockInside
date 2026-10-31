@@ -38,6 +38,8 @@
   --color-stone-hi: oklch(55% 0.02 75);     /* lit stone edges */
   --color-core: oklch(86% 0.09 88);         /* the Patron's light: pale brass, never team colours */
   --color-soul: oklch(88% 0.05 170);        /* soul orbs: pale patina light */
+  --color-window: oklch(80% 0.09 82);       /* warm lit window, 3D scene only */
+  --color-window-off: oklch(24% 0.012 70);  /* dark glass, 3D scene only */
   --color-error: var(--color-oxblood-text); --color-success: var(--color-patina-text);
   --font-display: "Advent Pro", "Arial Narrow", sans-serif;
   --font-body: "Onest", ui-sans-serif, system-ui, sans-serif;

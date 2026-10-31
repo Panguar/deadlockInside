@@ -1,6 +1,6 @@
 import "./home/hero.css";
 import { PlayerSearch } from "@/components/PlayerSearch";
-import { Patron } from "@/components/home/Patron";
+import { Tower } from "@/components/home/Tower";
 import { SmoothScroll } from "@/components/home/SmoothScroll";
 import { MetaSection } from "@/components/home/MetaSection";
 import { HeroGallery } from "@/components/home/HeroGallery";
@@ -8,11 +8,11 @@ import { WorkshopSection } from "@/components/home/WorkshopSection";
 import { ProfileSection } from "@/components/home/ProfileSection";
 
 const PARTS = [
-  { key: "guardians" as const, label: "Мета патча", href: "#meta" },
-  { key: "walkers" as const, label: "Герои", href: "#heroes" },
-  { key: "shrines" as const, label: "Билды", href: "#workshop" },
-  { key: "cage" as const, label: "Матчи и лидерборд", href: "#workshop" },
-  { key: "core" as const, label: "Ваш профиль", href: "#profile" },
+  { key: "meta" as const, label: "Мета патча", href: "#meta" },
+  { key: "heroes" as const, label: "Герои", href: "#heroes" },
+  { key: "builds" as const, label: "Билды", href: "#workshop" },
+  { key: "matches" as const, label: "Матчи и лидерборд", href: "#workshop" },
+  { key: "profile" as const, label: "Ваш профиль", href: "#profile" },
 ];
 
 export default function HomePage() {
@@ -21,7 +21,7 @@ export default function HomePage() {
       <SmoothScroll />
       <div className="home-stage-track">
         <div className="home-stage-layer">
-          <Patron parts={PARTS} />
+          <Tower parts={PARTS} />
         </div>
         <section id="top" className="home-hero" aria-labelledby="home-title">
           <div className="container home-hero-inner">

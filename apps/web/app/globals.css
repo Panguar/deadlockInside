@@ -1,6 +1,6 @@
-/* Hallmark · shape: custom vitrines · genre: atmospheric · theme: custom · idea: "the Patron's sanctum from a Deadlock lane, its defences falling in match order as you scroll, each fallen layer a vitrine of match data" · vibe: "art deco occult noir, brass and patina"
+/* Hallmark · shape: custom vitrines · genre: atmospheric · theme: custom · idea: "an art deco stat tower in the night fog, its floors are the site's sections and the hero floor is lit by real win rates" · vibe: "art deco occult noir, brass and patina"
  * paper: oklch(15.9% 0.006 85) · accent: oklch(73.1% 0.115 85) · display: Advent Pro · body: Onest · outlier: Poiret One (wordmark)
- * nav: site header, wordmark left, links, account action · footer: engraved brass plaque · hero: custom, wordmark head with search left, 3D reliquary right · signature: the lane push, guardians to Patron, each layer a section link · job: search a player
+ * nav: site header, wordmark left, links, account action · footer: engraved brass plaque · hero: custom, wordmark head with search left, 3D tower right · signature: the elevator ride down the tower, hero windows lit by data · job: search a player
  * axes: dark/display-condensed/chromatic-amber · posture: full palette (field charcoal and brown, signal brass, seal patina, warm oxblood) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: P, every ornament is made a working gauge so data leads the decoration */
 /* Hallmark · waive 12 · the gauge needle alone uses --ease-needle · a brass instrument needle settles past its mark like the real dial it imitates */
@@ -88,8 +88,8 @@ h1 em, h2 em, h3 em { color: var(--brass-bright); font-style: normal; }
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
-  background: color-mix(in oklab, var(--color-paper) 92%, transparent);
-  z-index: 4;
+  background: var(--color-paper);
+  z-index: var(--z-sticky-nav);
 }
 /* second, brass rule inset below the header line (double rule) */
 .site-header::after {

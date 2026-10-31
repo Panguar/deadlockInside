@@ -49,9 +49,98 @@
   opacity: 0;
 }
 
+.reliquary-labels li::before,
+.reliquary-labels li::after {
+  content: "";
+  position: absolute;
+  background-color: var(--color-accent);
+  pointer-events: none;
+}
+
+/* Brass bracket: a hairline from the sign to the anchor on the facade, ending in a square. */
+.reliquary-labels li::after {
+  left: 100%;
+  top: 50%;
+  width: var(--lead, 0px);
+  height: 1px;
+}
+
+.reliquary-labels li::before {
+  left: calc(100% + var(--lead, 0px) - 2px);
+  top: calc(50% - 2px);
+  width: 5px;
+  height: 5px;
+}
+
 .reliquary-labels a {
   position: relative;
   display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  background-color: var(--color-paper-2);
+  border: 1px solid var(--color-accent);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+/* Inner hairline: a second border inset 3px. */
+.reliquary-labels a::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--color-rule-strong);
+  pointer-events: none;
+}
+
+.reliquary-labels a:hover {
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.reliquary-labels a:hover::before {
+  border-color: var(--color-accent-ink);
+}
+
+.reliquary-labels a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  clip-path: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reliquary-labels a:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (pointer: coarse) {
+  .reliquary-labels a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+.reliquary-labels a:active {
+  transform: scale(0.97);
+}
+
+.reliquary-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: calc(var(--z-raised) + 1);
   padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--radius-card);
   background-color: var(--color-cream-card);
@@ -61,41 +150,17 @@
   line-height: 1.3;
   letter-spacing: 0;
   white-space: nowrap;
-  text-decoration: none;
-  transition:
-    background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out),
-    transform 160ms var(--ease-out);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms var(--ease-out);
 }
 
-.reliquary-labels a::before {
-  content: "";
-  position: absolute;
-  left: var(--space-xs);
-  top: 100%;
-  width: 1px;
-  height: 24px;
-  background-color: var(--color-rule-strong);
+.reliquary-tag[data-show="true"] {
+  opacity: 1;
 }
 
-.reliquary-labels a:hover {
-  background-color: var(--color-accent);
-  color: var(--color-accent-ink);
-}
-
-.reliquary-labels a:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .reliquary-labels a:hover {
-    transform: translateY(-2px);
-  }
-}
-
-.reliquary-labels a:active {
-  transform: scale(0.97);
+.reliquary-stage[data-live="false"] .reliquary-tag {
+  display: none;
 }
 
 html:not(.js) .reliquary-labels,
@@ -121,13 +186,16 @@ html:not(.js) .reliquary-labels li,
   pointer-events: auto;
 }
 
-html:not(.js) .reliquary-labels a::before,
-.reliquary-stage[data-live="false"] .reliquary-labels a::before {
+html:not(.js) .reliquary-labels li::before,
+html:not(.js) .reliquary-labels li::after,
+.reliquary-stage[data-live="false"] .reliquary-labels li::before,
+.reliquary-stage[data-live="false"] .reliquary-labels li::after {
   display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reliquary-still,
+  .reliquary-tag,
   .reliquary-labels li,
   .reliquary-labels a {
     transition: none;
